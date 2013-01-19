@@ -1,6 +1,8 @@
-export function _mk_func (name, params, ret, body, lang = \plv8, skip-compile)
+export function _mk_func (
+  name, param-obj, ret, body, lang = \plv8, skip-compile
+)
   params = []
-  args = for name, type of params
+  args = for name, type of param-obj
     params.push "#name #type"
     if type is \pgrest_json
       "JSON.parse(#name)"
@@ -16,7 +18,9 @@ export function _mk_func (name, params, ret, body, lang = \plv8, skip-compile)
 
   compiled ||= body
   body = "JSON.stringify((eval(#compiled))(#args));";
+
   return """
+
 SET client_min_messages TO WARNING;
 DO \$PGREST_EOF\$ BEGIN
 
@@ -31,4 +35,5 @@ return #body
 \$PGREST_#name\$ LANGUAGE #lang IMMUTABLE STRICT;
 
 EXCEPTION WHEN OTHERS THEN END; \$PGREST_EOF\$;
+
   """
