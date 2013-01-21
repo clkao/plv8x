@@ -24,8 +24,8 @@ export function _mk_func (
 SET client_min_messages TO WARNING;
 DO \$PGREST_EOF\$ BEGIN
 
-DROP FUNCTION IF EXISTS $name (#params);
-DROP FUNCTION IF EXISTS $name (#{
+DROP FUNCTION IF EXISTS #{name} (#params);
+DROP FUNCTION IF EXISTS #{name} (#{
   for p in params
     if p is /pgrest_json/ then \json else p
 });
