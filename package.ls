@@ -12,9 +12,9 @@ repository:
   url: 'git://github.com/clkao/plv8x.git'
 scripts:
   prepublish: """
-    ./node_modules/.bin/lsc -cj package.ls &&
-    ./node_modules/.bin/lsc -bc bin &&
-    ./node_modules/.bin/lsc -bc -o lib src
+    env PATH="./node_modules/.bin:$PATH" lsc -cj package.ls &&
+    lsc -bc bin &&
+    lsc -bc -o lib src
   """
 engines: {node: '*'}
 dependencies:

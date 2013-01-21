@@ -16,7 +16,7 @@
     "url": "git://github.com/clkao/plv8x.git"
   },
   "scripts": {
-    "prepublish": "./node_modules/.bin/lsc -cj package.ls &&\n./node_modules/.bin/lsc -bc bin &&\n./node_modules/.bin/lsc -bc -o lib src"
+    "prepublish": "env PATH=\"./node_modules/.bin:$PATH\" lsc -cj package.ls &&\nlsc -bc bin &&\nlsc -bc -o lib src"
   },
   "engines": {
     "node": "*"
