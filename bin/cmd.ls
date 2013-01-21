@@ -1,4 +1,5 @@
 require! <[browserify fs resolve pg]>
+plv8x = require \../
 
 argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 .option 'db' do
@@ -33,6 +34,7 @@ bundle.on 'syntaxError' (err) ->
     bundle.require(req);
 
 src = bundle.bundle!
+src.= replace /^var require =/g, 'require ='
 #console.log src
 
 bootstrap_code = """
@@ -42,8 +44,19 @@ bootstrap_code = """
 setupDatabase = (bootstrap_code) ->
     return with new pg.Client argv.db
         ..connect!
-#        ..query bootstrap
-#        ..query "select plv8x_bootstrap()");
+        ..query '''
+DO $$ BEGIN
+    CREATE DOMAIN plv8x_json AS json;
+EXCEPTION WHEN OTHERS THEN END; $$;
+'''
+        ..query plv8x._mk_func \jseval {str: \text} \text """
+function(str) { return eval(str) }
+"""
+        ..query plv8x._mk_func \jsapply {str: \text, args: \plv8x_json} \plv8x_json """
+function (func, args) {
+    return eval(func).apply(null, args);
+}
+"""
         r = ..query 'INSERT INTO "plv8x".code ("name", "code", "load_seq") VALUES($1, $2, $3)' [\LiveScript, src, 0]
         r.on \row -> console.log ...
         r.on \end -> console.log \end; ..end!
