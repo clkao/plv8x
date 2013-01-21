@@ -5,6 +5,7 @@ author:
 name: 'plv8x'
 description: 'loading modules for plv8'
 version: '0.0.1'
+main: \lib/index.js
 bin:
   plv8x: 'bin/cmd.js'
 repository:
