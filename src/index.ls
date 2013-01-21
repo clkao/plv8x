@@ -2,11 +2,11 @@ export function _mk_func (
   name, param-obj, ret, body, lang = \plv8, skip-compile
 )
   params = []
-  args = for name, type of param-obj
-    params.push "#name #type"
+  args = for pname, type of param-obj
+    params.push "#pname #type"
     if type is \pgrest_json
-      "JSON.parse(#name)"
-    else name
+      "JSON.parse(#pname)"
+    else pname
 
   if lang is \plls and not skip-compile
     lang = \plv8
