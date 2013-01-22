@@ -12,6 +12,7 @@ repository:
   type: 'git'
   url: 'git://github.com/clkao/plv8x.git'
 scripts:
+  test: 'env PATH="./node_modules/.bin:$PATH" mocha'
   prepublish: """
     env PATH="./node_modules/.bin:$PATH" lsc -cj package.ls &&
     lsc -bc bin &&
@@ -23,6 +24,9 @@ dependencies:
   optimist: \0.3.x
   pg: \0.11.x
   resolve: \0.2.x
+devDependencies:
+  mocha: \*
+  chai: \*
 peerDependencies:
   LiveScript: \1.1.x
 optionalDependencies: {}
