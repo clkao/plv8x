@@ -31,13 +31,13 @@ DO $$ BEGIN
 EXCEPTION WHEN OTHERS THEN END; $$;
 
 DO $$ BEGIN
-    CREATE DOMAIN pgrest_json AS text CHECK ( json_syntax_check(VALUE) );
+    CREATE DOMAIN plv8x_json AS text CHECK ( json_syntax_check(VALUE) );
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
     else
       ..query '''
 DO $$ BEGIN
-    CREATE DOMAIN pgrest_json AS json;
+    CREATE DOMAIN plv8x_json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
     ..query '''
@@ -64,7 +64,7 @@ export function _mk_func (
   params = []
   args = for pname, type of param-obj
     params.push "#pname #type"
-    if type is \pgrest_json
+    if type is \plv8x_json
       "JSON.parse(#pname)"
     else pname
 
@@ -82,18 +82,18 @@ export function _mk_func (
   return """
 
 SET client_min_messages TO WARNING;
-DO \$PGREST_EOF\$ BEGIN
+DO \$PLV8X_EOF\$ BEGIN
 
 DROP FUNCTION IF EXISTS #{name} (#params);
 DROP FUNCTION IF EXISTS #{name} (#{
   for p in params
-    if p is /pgrest_json/ then \json else p
+    if p is /plv8x_json/ then \json else p
 });
 
-CREATE FUNCTION #name (#params) RETURNS #ret AS \$PGREST_#name\$
+CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X_#name\$
 return #body
-\$PGREST_#name\$ LANGUAGE #lang IMMUTABLE STRICT;
+\$PLV8X_#name\$ LANGUAGE #lang IMMUTABLE STRICT;
 
-EXCEPTION WHEN OTHERS THEN END; \$PGREST_EOF\$;
+EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;
 
   """
