@@ -24,9 +24,9 @@ dependencies:
   optimist: \0.3.x
   pg: \0.11.x
   resolve: \0.2.x
+  one: \1.8.x
 devDependencies:
   mocha: \*
   chai: \*
-peerDependencies:
-  LiveScript: \1.1.x
+  LiveScript: \1.1.1
 optionalDependencies: {}

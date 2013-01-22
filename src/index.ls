@@ -46,7 +46,19 @@ DO $$ BEGIN
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
     ..query _mk_func \jseval {str: \text} \text """
-function(str) { return eval(str) }
+function(str) {
+    return eval(str)
+}
+"""
+    ..query "select jseval($1)" ['plv8x_jsid = 0']
+    ..query _mk_func \jsevalit {str: \text} \text """
+function (str) {
+    ++plv8x_jsid;
+    var id = "plv8x_jsid" + plv8x_jsid;
+    var body = id + " = (function() {return (" + str + ");})()";
+    var ret = eval(body);
+    return id;
+}
 """
     ..query fs.readFileSync 'plv8x.sql' \utf8
     r = ..query _mk_func \jsapply {str: \text, args: \plv8x_json} \plv8x_json """
@@ -77,7 +89,8 @@ export function _mk_func (
     compiled -= /;$/
 
   compiled ||= body
-  body = "JSON.stringify((eval(#compiled))(#args));";
+  body = "(eval(#compiled))(#args)";
+  body = "JSON.stringify(#body)" if ret is \plv8x_json
 
   return """
 
@@ -91,7 +104,7 @@ DROP FUNCTION IF EXISTS #{name} (#{
 });
 
 CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X_#name\$
-return #body
+return #body;
 \$PLV8X_#name\$ LANGUAGE #lang IMMUTABLE STRICT;
 
 EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;

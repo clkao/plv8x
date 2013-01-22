@@ -23,3 +23,40 @@ describe 'db', -> ``it``
     expect err .to.be.a('null');
     expect res.rows.0.jsapply .to.equal(\43)
     done!
+  .. 'evalit', (done) ->
+    err, res <- conn.query "select jsevalit('function(a) { return a + 1 }') as ret"
+    expect(err).to.be.a('null');
+    func = res.rows.0.ret
+    err, res <- conn.query "select jseval($1) as ret", ["typeof #func"]
+    expect(err).to.be.a('null');
+    {ret} = res.rows.0
+    expect ret .to.equal \function
+    err, res <- conn.query "select jsapply($1, $2)" [func, JSON.stringify [42]]
+    expect err .to.be.a('null');
+    expect res.rows.0.jsapply .to.equal \43
+    done!
+  .. 'ls', (done) ->
+    one = require \one
+    manifest = './node_modules/LiveScript/package.json'
+    one.quiet true
+    err, ls <- one.build manifest, {-debug}
+    throw err if err
+
+    # XXX
+    delete global.key
+
+    # get require entrance for onejs bundles
+    err, res <- conn.query "select jsevalit($1) as ret", ["""
+(function() {
+    var module = {exports: {}};
+    #ls;
+    return module.exports.require;
+})()
+    """]
+    expect(err).to.be.a \null
+    req = res.rows.0.ret
+    err, res <- conn.query "select jsapply($1, $2) as ret", [req, '["LiveScript"]']
+    expect err .to.be.a \null
+    ret = JSON.parse res.rows.0.ret
+    expect ret .to.deep.equal { VERSION: '1.1.1' }
+    done!
