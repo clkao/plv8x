@@ -20,11 +20,10 @@ scripts:
   """
 engines: {node: '*'}
 dependencies:
-  browserify: \1.17.x
   optimist: \0.3.x
   pg: \0.11.x
   resolve: \0.2.x
-  one: \1.8.x
+  one: 'git://github.com/azer/onejs.git'
 devDependencies:
   mocha: \*
   chai: \*

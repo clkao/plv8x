@@ -110,3 +110,12 @@ return #body;
 EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;
 
   """
+
+
+export function list(conn, cb)
+  (err, res) <- conn.query "select * from plv8x.code"
+  cb res.rows
+
+export function purge(conn, cb)
+  (err, res) <- conn.query "delete from plv8x.code"
+  cb res.rows
