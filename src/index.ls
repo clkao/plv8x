@@ -119,3 +119,13 @@ export function list(conn, cb)
 export function purge(conn, cb)
   (err, res) <- conn.query "delete from plv8x.code"
   cb res.rows
+
+export function bundle(manifest, cb)
+  require! one
+  one.quiet true
+  err, bundle <- one.build manifest, {-debug}
+  throw err if err
+
+  # XXX
+  delete global.key
+  cb bundle

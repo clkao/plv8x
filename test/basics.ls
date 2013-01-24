@@ -36,15 +36,8 @@ describe 'db', -> ``it``
     expect res.rows.0.jsapply .to.equal \43
     done!
   .. 'ls', (done) ->
-    one = require \one
     manifest = './node_modules/LiveScript/package.json'
-    one.quiet true
-    err, ls <- one.build manifest, {-debug}
-    throw err if err
-
-    # XXX
-    delete global.key
-
+    ls <- plv8x.bundle manifest
     # get require entrance for onejs bundles
     err, res <- conn.query "select jsevalit($1) as ret", ["""
 (function() {
