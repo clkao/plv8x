@@ -9,6 +9,8 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
   desc: 'List bundles'
 .option 'purge' do
   desc: 'Purge bundles'
+.option 'import' do
+  desc: 'Import bundles'
 .option 'help' do
   alias: 'h'
   desc: 'Show this message'
@@ -24,6 +26,11 @@ console.log \done
 done = -> conn.end!
 
 switch
+| argv.import =>
+  plv8x.import-bundle conn, ...argv.import.split(\:), ->
+    console.log it
+    done!
+  console.log \purge
 | argv.purge =>
   plv8x.purge conn, ->
     console.log it

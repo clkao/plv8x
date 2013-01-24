@@ -53,3 +53,10 @@ describe 'db', -> ``it``
     ret = JSON.parse res.rows.0.ret
     expect ret .to.deep.equal { VERSION: '1.1.1' }
     done!
+  .. 'purge', (done) ->
+    <- plv8x.purge conn
+    done!
+  .. 'import', (done) ->
+    <- plv8x.import-bundle conn, \LiveScript, './node_modules/LiveScript/package.json'
+    console.log it
+    done!

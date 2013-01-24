@@ -129,3 +129,16 @@ export function bundle(manifest, cb)
   # XXX
   delete global.key
   cb bundle
+
+export function import-bundle(conn, name, manifest, cb)
+  code <- bundle manifest
+  err, res <- conn.query "select name from plv8x.code where name = $1", [name]
+  console.log res.rows
+  [q, bind] = if res.rows.length # udpate
+    ["update plv8x.code set name = $1, code = $2" [name, code]]
+  else
+    ["insert into plv8x.code (name, code) values($1, $2)" [name, code]]
+  err, res <- conn.query q, bind
+  throw err if err
+  cb res.rows
+
