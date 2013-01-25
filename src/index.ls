@@ -129,6 +129,11 @@ export function bundle(manifest, cb)
   delete global.key
   cb bundle
 
+export function delete-bundle(conn, name, cb)
+  err, res <- conn.query "delete from plv8x.code where name = $1" [name]
+  throw err if err
+  cb res.rows
+
 export function import-bundle(conn, name, manifest, cb)
   code <- bundle manifest
   err, res <- conn.query "select name from plv8x.code where name = $1" [name]
