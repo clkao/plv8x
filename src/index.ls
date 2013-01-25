@@ -179,12 +179,14 @@ export function plv8x-lift(module, func-name)
   """
   function() {
     plv8x_require = #{body.toString!replace /(['\\])/g, '\$1'};
-    plv8.elog(WARNING, "apply", arguments);
     return plv8x_require('#{module}').#{func-name}.apply(null, arguments);
   }
   """
 
 plv8x-require = (name) ->
+  ``if (typeof plv8x_global == 'undefined') plv8x_global = {}``
+  return plv8x_global[name] if plv8x_global[name]?
+
   res = plv8.execute "select name, code from plv8x.code", []
   x = {}
   for {code,name:bundle} in res
@@ -198,7 +200,7 @@ plv8x-require = (name) ->
 """
       req = eval loader
       module = req name
-      return module if module?
+      return plv8x_global[name] = module if module?
     catch
   plv8.elog WARNING, "failed to load module #name"
 

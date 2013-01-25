@@ -87,5 +87,5 @@ describe 'db', -> ``it``
     err, res <- conn.query """select plv8x_eval('plv8x_require("LiveScript").xxx') as ret"""
     expect err .to.be.a('null');
     {ret} = res.rows.0
-    expect ret .to.equal 123
+    expect ret .to.equal \123
     done!
