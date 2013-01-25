@@ -60,6 +60,11 @@ function (str) {
     return id;
 }
 """
+#    console.log _mk_func \plv8x_boot {} \boolean plv8x-boot plv8x-require
+##    (err, res) <- ..query _mk_func \plv8x_boot {} \boolean plv8x-boot plv8x-require
+#    console.log err, res
+#    ..query "select plv8x_boot()"
+    ..query "select jseval($1)" ['require = ' + plv8x-require]
     ..query fs.readFileSync 'plv8x.sql' \utf8
     r = ..query _mk_func \jsapply {str: \text, args: \plv8x_json} \plv8x_json """
 function (func, args) {
@@ -132,7 +137,7 @@ export function bundle(manifest, cb)
 
 export function import-bundle(conn, name, manifest, cb)
   code <- bundle manifest
-  err, res <- conn.query "select name from plv8x.code where name = $1", [name]
+  err, res <- conn.query "select name from plv8x.code where name = $1" [name]
   console.log res.rows
   [q, bind] = if res.rows.length # udpate
     ["update plv8x.code set name = $1, code = $2" [name, code]]
@@ -142,3 +147,26 @@ export function import-bundle(conn, name, manifest, cb)
   throw err if err
   cb res.rows
 
+export function plv8x-boot(body)
+  """
+  (require = #{body.toString!replace /(['\\])/g, '\$1'}, true)
+  """
+
+
+plv8x-require = (name) ->
+  res = plv8.execute "select name, code from plv8x.code", []
+  x = {}
+  for {code,name} in res
+    try
+      loader = """
+(function() {
+    var module = {exports: {}};
+    #code;
+    return module.exports.require;
+})()
+"""
+      plv8.elog WARNING, loader.length
+      req = eval loader
+      return req name
+
+module.exports.plv8x-require = plv8x-require

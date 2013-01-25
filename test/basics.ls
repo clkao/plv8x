@@ -60,3 +60,9 @@ describe 'db', -> ``it``
     <- plv8x.import-bundle conn, \LiveScript, './node_modules/LiveScript/package.json'
     console.log it
     done!
+  .. 'plv8x_require', (done) ->
+    err, res <- conn.query "select jseval($1) as ret", ["require('LiveScript').VERSION"]
+    expect(err).to.be.a('null');
+    {ret} = res.rows.0
+    expect ret .to.equal \1.1.1
+    done!
