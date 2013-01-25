@@ -81,3 +81,11 @@ describe 'db', -> ``it``
     {ret} = res.rows.0
     expect (eval ret)! .to.equal 42
     done!
+  .. 'required object persistency', (done) ->
+    err, res <- conn.query """select plv8x_eval('plv8x_require("LiveScript").xxx = 123')"""
+    expect(err).to.be.a('null');
+    err, res <- conn.query """select plv8x_eval('plv8x_require("LiveScript").xxx') as ret"""
+    expect err .to.be.a('null');
+    {ret} = res.rows.0
+    expect ret .to.equal 123
+    done!
