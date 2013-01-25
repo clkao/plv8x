@@ -163,7 +163,6 @@ export function mk-user-func(conn, spec, source, cb)
   else
     (require \LiveScript .compile expression, {+bare}) - /;$/
 
-  console.log _mk_func name, param-obj, rettype, body
   err, res <- conn.query _mk_func name, param-obj, rettype, body
   throw err if err
   console.log res

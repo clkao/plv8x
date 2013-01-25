@@ -68,3 +68,16 @@ describe 'db', -> ``it``
     {ret} = res.rows.0
     expect ret .to.equal \1.1.1
     done!
+  .. 'lscompile', (done) ->
+    err, res <- conn.query "select lscompile($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
+    expect(err).to.be.a('null');
+    {ret} = res.rows.0
+    expect (eval ret)! .to.equal 42
+    done!
+  .. 'mk-user-func', (done) ->
+    <- plv8x.mk-user-func conn, "text lsgo(text, plv8x_json)", ':-> plv8x_require "LiveScript" .compile ...'
+    err, res <- conn.query "select lsgo($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
+    expect(err).to.be.a('null');
+    {ret} = res.rows.0
+    expect (eval ret)! .to.equal 42
+    done!
