@@ -59,6 +59,8 @@ describe 'db', -> ``it``
   .. 'import', (done) ->
     <- plv8x.import-bundle conn, \LiveScript, './node_modules/LiveScript/package.json'
     console.log it
+    <- plv8x.import-bundle conn, \plv8x, './package.json'
+    console.log it
     done!
   .. 'plv8x_require', (done) ->
     err, res <- conn.query "select jseval($1) as ret", ["plv8x_require('LiveScript').VERSION"]

@@ -1,6 +1,5 @@
-require! <[fs pg]>
-
 export function connect(db)
+  require! pg
   with new pg.Client db
     ..connect!
 
@@ -60,7 +59,8 @@ function (str) {
 }
 """
     ..query _mk_func \plv8x_boot {} \void plv8x-boot plv8x-require
-    ..query fs.readFileSync 'plv8x.sql' \utf8
+    ..query _mk_func \lscompile {str: \text, args: \plv8x_json} \text plv8x-lift "LiveScript", "compile"
+    ..query require(\fs)readFileSync 'plv8x.sql' \utf8
     ..query "select plv8x_boot()"
     r = ..query _mk_func \jsapply {str: \text, args: \plv8x_json} \plv8x_json """
 function (func, args) {
@@ -150,6 +150,15 @@ export function plv8x-boot(body)
   function() { plv8x_require = #{body.toString!replace /(['\\])/g, '\$1'} }
   """
 
+export function plv8x-lift(module, func-name)
+  body = plv8x-require
+  """
+  function() {
+    plv8x_require = #{body.toString!replace /(['\\])/g, '\$1'};
+    plv8.elog(WARNING, "apply", arguments);
+    return plv8x_require('#{module}').#{func-name}.apply(null, arguments);
+  }
+  """
 
 plv8x-require = (name) ->
   res = plv8.execute "select name, code from plv8x.code", []
