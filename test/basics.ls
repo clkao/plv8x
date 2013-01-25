@@ -61,7 +61,7 @@ describe 'db', -> ``it``
     console.log it
     done!
   .. 'plv8x_require', (done) ->
-    err, res <- conn.query "select jseval($1) as ret", ["require('LiveScript').VERSION"]
+    err, res <- conn.query "select jseval($1) as ret", ["plv8x_require('LiveScript').VERSION"]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect ret .to.equal \1.1.1

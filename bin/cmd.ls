@@ -21,7 +21,6 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 
 conn = plv8x.connect argv.db
 <- plv8x.bootstrap conn
-console.log \done
 
 done = -> conn.end!
 
@@ -37,8 +36,8 @@ switch
     done!
   console.log \purge
 | argv.list =>
-  console.log \list
-  plv8x.list conn, ->
-    console.log it
+  plv8x.list conn, (res) ->
+    for {name, code} in res
+      console.log "#name: #{code.length} bytes"
     done!
 | otherwise => console.log \foo; done!

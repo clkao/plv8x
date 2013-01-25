@@ -9,7 +9,6 @@ export function bootstrap(conn, done)
     (err, res) <- ..query "select version()"
     #->[0][0] =~ m/
     [_, pg_version] = res.rows.0.version.match /^PostgreSQL ([\d\.]+)/
-    console.log pg_version
     if pg_version >= \9.1.0
       ..query '''
 DO $$ BEGIN
@@ -60,19 +59,14 @@ function (str) {
     return id;
 }
 """
-#    console.log _mk_func \plv8x_boot {} \boolean plv8x-boot plv8x-require
-##    (err, res) <- ..query _mk_func \plv8x_boot {} \boolean plv8x-boot plv8x-require
-#    console.log err, res
-#    ..query "select plv8x_boot()"
-    ..query "select jseval($1)" ['require = ' + plv8x-require]
+    ..query _mk_func \plv8x_boot {} \void plv8x-boot plv8x-require
     ..query fs.readFileSync 'plv8x.sql' \utf8
+    ..query "select plv8x_boot()"
     r = ..query _mk_func \jsapply {str: \text, args: \plv8x_json} \plv8x_json """
 function (func, args) {
     return eval(func).apply(null, args);
 }
 """
-#    r = ..query 'INSERT INTO "plv8x".code ("name", "code", "load_seq") VALUES($1, $2, $3)' [\LiveScript, src, 0]
-#    r.on \row -> console.log ...
     r.on \end done
 
 export function _mk_func (
@@ -138,7 +132,6 @@ export function bundle(manifest, cb)
 export function import-bundle(conn, name, manifest, cb)
   code <- bundle manifest
   err, res <- conn.query "select name from plv8x.code where name = $1" [name]
-  console.log res.rows
   [q, bind] = if res.rows.length # udpate
     ["update plv8x.code set name = $1, code = $2" [name, code]]
   else
@@ -149,14 +142,14 @@ export function import-bundle(conn, name, manifest, cb)
 
 export function plv8x-boot(body)
   """
-  (require = #{body.toString!replace /(['\\])/g, '\$1'}, true)
+  function() { plv8x_require = #{body.toString!replace /(['\\])/g, '\$1'} }
   """
 
 
 plv8x-require = (name) ->
   res = plv8.execute "select name, code from plv8x.code", []
   x = {}
-  for {code,name} in res
+  for {code,name:bundle} in res
     try
       loader = """
 (function() {
@@ -165,8 +158,10 @@ plv8x-require = (name) ->
     return module.exports.require;
 })()
 """
-      plv8.elog WARNING, loader.length
       req = eval loader
-      return req name
+      module = req name
+      return module if module?
+    catch
+  plv8.elog WARNING, "failed to load module #name"
 
 module.exports.plv8x-require = plv8x-require
