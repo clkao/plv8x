@@ -43,13 +43,13 @@ DO $$ BEGIN
     CREATE DOMAIN plv8x_json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
-    ..query _mk_func \jseval {str: \text} \text """
+    ..query _mk_func \plv8x_eval {str: \text} \text """
 function(str) {
     return eval(str)
 }
 """
-    ..query "select jseval($1)" ['plv8x_jsid = 0']
-    ..query _mk_func \jsevalit {str: \text} \text """
+    ..query "select plv8x_eval($1)" ['plv8x_jsid = 0']
+    ..query _mk_func \plv8x_evalit {str: \text} \text """
 function (str) {
     ++plv8x_jsid;
     var id = "plv8x_jsid" + plv8x_jsid;
@@ -62,7 +62,7 @@ function (str) {
     ..query _mk_func \lscompile {str: \text, args: \plv8x_json} \text plv8x-lift "LiveScript", "compile"
     ..query require(\fs)readFileSync 'plv8x.sql' \utf8
     ..query "select plv8x_boot()"
-    r = ..query _mk_func \jsapply {str: \text, args: \plv8x_json} \plv8x_json """
+    r = ..query _mk_func \plv8x_apply {str: \text, args: \plv8x_json} \plv8x_json """
 function (func, args) {
     return eval(func).apply(null, args);
 }
@@ -82,7 +82,7 @@ export function _mk_func (
   if lang is \plls and not skip-compile
     lang = \plv8
     [{ compiled }] = plv8.execute do
-      'SELECT jsapply($1, $2) AS compiled'
+      'SELECT plv8x_apply($1, $2) AS compiled'
       'LiveScript.compile'
       JSON.stringify [body, { +bare }]
     compiled -= /;$/
