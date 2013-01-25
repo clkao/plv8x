@@ -101,13 +101,11 @@ DROP FUNCTION IF EXISTS #{name} (#{
   for p in params
     if p is /plv8x_json/ then \json else p
 });
+EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;
 
 CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X_#name\$
 return #body;
 \$PLV8X_#name\$ LANGUAGE #lang IMMUTABLE STRICT;
-
-EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;
-
   """
 
 
@@ -144,6 +142,33 @@ export function import-bundle(conn, name, manifest, cb)
   err, res <- conn.query q, bind
   throw err if err
   cb res.rows
+
+export function mk-user-func(conn, spec, source, cb)
+  #conn.query
+  [_, rettype, name, args] = spec.match /^(\w+)?\s*(\w+)\((.*)\)$/ or throw "failed to parse #spec"
+
+  param-obj = {}
+  for arg, idx in args.split /\s*,\s*/
+    console.log arg
+    [_, type, param-name] = arg.match /^(\w+)\s*(\w+)?$/ or throw "failed to parse param #arg"
+    param-name ?= "__#{idx}"
+    param-obj[param-name] = type
+
+  [_, pkg, expression] = source.match /^(\w*):(.*)$/ or throw "failed to parse source #source"
+
+  body = if pkg
+    plv8x-lift pkg, expression
+  else if expression.match /^function/
+    expression
+  else
+    (require \LiveScript .compile expression, {+bare}) - /;$/
+
+  console.log _mk_func name, param-obj, rettype, body
+  err, res <- conn.query _mk_func name, param-obj, rettype, body
+  throw err if err
+  console.log res
+
+  cb { rettype, name, param-obj, body }
 
 export function plv8x-boot(body)
   """

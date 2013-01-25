@@ -13,6 +13,8 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
   desc: 'Import bundles'
 .option 'delete' do
   desc: 'Delete bundles'
+.option 'inject' do
+  desc: 'Inject plv8 function from bundles or string'
 .option 'help' do
   alias: 'h'
   desc: 'Show this message'
@@ -33,6 +35,11 @@ switch
   console.log \purge
 | argv.delete =>
   plv8x.delete-bundle conn, argv.delete, ->
+    done!
+| argv.inject =>
+  [spec, source] = argv.inject.split \=
+  plv8x.mk-user-func conn, spec, source, ->
+    console.log it
     done!
 | argv.purge =>
   plv8x.purge conn, ->
