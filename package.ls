@@ -3,7 +3,7 @@ author:
   name: ['Chia-liang Kao']
   email: 'clkao@clkao.org'
 name: 'plv8x'
-description: 'loading modules for plv8'
+description: 'Deploy Node.js module bundles into PostgreSQL plv8'
 version: '0.0.1'
 main: \lib/index.js
 bin:

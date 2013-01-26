@@ -32,7 +32,6 @@ switch
 | argv.import =>
   plv8x.import-bundle conn, ...argv.import.split(\:), ->
     done!
-  console.log \purge
 | argv.delete =>
   plv8x.delete-bundle conn, argv.delete, ->
     done!
@@ -45,10 +44,9 @@ switch
   plv8x.purge conn, ->
     console.log it
     done!
-  console.log \purge
 | argv.list =>
   plv8x.list conn, (res) ->
     for {name, code} in res
       console.log "#name: #{code.length} bytes"
     done!
-| otherwise => console.log \foo; done!
+| otherwise => console.log "Unknown command: #{argv._.0}"; done!
