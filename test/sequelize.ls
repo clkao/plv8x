@@ -30,7 +30,7 @@ describe 'db', -> ``it``
 
     serial = 0
     deferred = []
-    ``setTimeout`` = (fn, ms=0) -> deferred.push [ms, fn + (serial++ * 0.001)]
+    ``setTimeout`` = (fn, ms=0) -> deferred.push [fn, ms + (serial++ * 0.001)]
 
     {STRING, TEXT, DATE, BOOLEAN, INTEGER}:Sequelize = plv8x_require "sequelize"
     sql = new Sequelize null, null, null do
@@ -51,7 +51,7 @@ describe 'db', -> ``it``
 
     while deferred.length
         deferred.sort (a, b) -> a.1 - b.1
-        deferred.shift!!
+        deferred.shift!0!
 
     return rv
     """]
