@@ -1,3 +1,4 @@
+``#!/usr/bin/env node``
 require! <[browserify fs resolve pg]>
 plv8x = require \../
 
