@@ -133,7 +133,13 @@ export function delete-bundle(conn, name, cb)
   cb res.rows
 
 export function import-bundle(conn, name, manifest, cb)
-  code <- bundle manifest
+  bundle_from = (m, cb) ->
+    if m is /\.js$/
+      cb (require \fs .readFileSync m, \utf8)
+    else
+      bundle m, cb
+  code <- bundle_from manifest
+  console.log code.length
   err, res <- conn.query "select name from plv8x.code where name = $1" [name]
   [q, bind] = if res.rows.length # udpate
     ["update plv8x.code set name = $1, code = $2" [name, code]]
@@ -189,6 +195,7 @@ plv8x-require = (name) ->
 
   res = plv8.execute "select name, code from plv8x.code", []
   x = {}
+  err = ''
   for {code,name:bundle} in res
     try
       loader = """
@@ -201,7 +208,10 @@ plv8x-require = (name) ->
       req = eval loader
       module = req name
       return plv8x_global[name] = module if module?
-    catch
-  plv8.elog WARNING, "failed to load module #name"
+    catch e
+      if e isnt /Cannot find module/
+        break
+      err := e
+  plv8.elog WARNING, "failed to load module #name: #err"
 
 module.exports.plv8x-require = plv8x-require
