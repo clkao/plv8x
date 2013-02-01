@@ -45,17 +45,16 @@ describe 'db', -> ``it``
 
     rv = null
     do
-        (entry) <- System.find('socialtext-schema-version').success
+        (entry) <- System.find('socialtext-schema-version').on "success"
         rv := entry
-        console.log entry
 
-    while deferred.length
-        deferred.sort (a, b) -> a.1 - b.1
-        deferred.shift!0!
+    doit = (-> return unless deferred.length; deferred.shift!0!; doit!)
+    doit!
 
-    return rv
+    JSON.stringify rv
     """]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
+    console.log JSON.stringify ret
     expect ret .to.equal \1.1.1
     done!
