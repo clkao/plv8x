@@ -1,5 +1,5 @@
 ``#!/usr/bin/env node``
-require! <[browserify fs resolve pg]>
+require! <[fs resolve pg]>
 plv8x = require \../
 
 argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
