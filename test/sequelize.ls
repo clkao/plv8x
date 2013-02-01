@@ -27,7 +27,11 @@ describe 'db', -> ``it``
   .. 'plv8x_require', (done) ->
     err, res <- conn.query """select plv8x_eval(lscompile($1, '{"bare": true}')) as ret""", ["""
     ``console`` = { log: -> plv8.elog(WARNING, ...arguments) }
-    ``setTimeout`` = -> it!
+
+    serial = 0
+    deferred = []
+    ``setTimeout`` = (fn, ms=0) -> deferred.push [ms, fn + (serial++ * 0.001)]
+
     {STRING, TEXT, DATE, BOOLEAN, INTEGER}:Sequelize = plv8x_require "sequelize"
     sql = new Sequelize null, null, null do
         dialect: "plv8"
@@ -39,10 +43,17 @@ describe 'db', -> ``it``
 
     System = sql.define 'System' SystemModel, { +freezeTableName }
 
+    rv = null
     do
         (entry) <- System.find('socialtext-schema-version').success
+        rv := entry
         console.log entry
-    "wtf"
+
+    while deferred.length
+        deferred.sort (a, b) -> a.1 - b.1
+        deferred.shift!!
+
+    return rv
     """]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
