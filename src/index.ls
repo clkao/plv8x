@@ -3,6 +3,34 @@ export function connect(db)
   with new pg.Client db
     ..connect!
 
+export function plv8x-sql
+  """
+DO $$
+BEGIN
+
+    IF NOT EXISTS(
+        SELECT schema_name
+          FROM information_schema.schemata
+          WHERE schema_name = 'plv8x'
+      )
+    THEN
+      EXECUTE 'CREATE SCHEMA plv8x';
+    END IF;
+
+END
+
+$$;
+
+COMMENT ON SCHEMA plv8x IS 'Out-of-table for loading plv8 modules';
+
+CREATE TABLE IF NOT EXISTS plv8x.code (
+    name text,
+    code text,
+    load_seq int,
+    updated timestamp
+);
+  """
+
 export function bootstrap(conn, done)
   with conn
     (err, res) <- ..query "select version()"
@@ -60,7 +88,7 @@ function (str) {
 """
     ..query _mk_func \plv8x_boot {} \void plv8x-boot plv8x-require
     ..query _mk_func \lscompile {str: \text, args: \plv8x_json} \text plv8x-lift "LiveScript", "compile"
-    ..query require(\fs)readFileSync 'plv8x.sql' \utf8
+    ..query plv8x-sql!
     ..query "select plv8x_boot()"
     r = ..query _mk_func \plv8x_apply {str: \text, args: \plv8x_json} \plv8x_json """
 function (func, args) {
