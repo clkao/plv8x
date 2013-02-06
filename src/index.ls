@@ -148,7 +148,7 @@ export function purge(conn, cb)
 export function bundle(manifest, cb)
   require! one
   one.quiet true
-  err, bundle <- one.build manifest, {-debug}
+  err, bundle <- one.build manifest, {-debug, exclude: <[one pg]>}
   throw err if err
 
   # XXX
