@@ -27,7 +27,7 @@
     "optimist": "0.3.x",
     "pg": "0.11.x",
     "resolve": "0.2.x",
-    "one": "git://github.com/azer/onejs.git"
+    "one": "1.8.x"
   },
   "devDependencies": {
     "mocha": "*",
