@@ -174,12 +174,10 @@ export function import-bundle(conn, name, manifest, cb)
   cb res.rows
 
 export function mk-user-func(conn, spec, source, cb)
-  #conn.query
   [_, rettype, name, args] = spec.match /^(\w+)?\s*(\w+)\((.*)\)$/ or throw "failed to parse #spec"
 
   param-obj = {}
   for arg, idx in args.split /\s*,\s*/
-    console.log arg
     [_, type, param-name] = arg.match /^(\w+)\s*(\w+)?$/ or throw "failed to parse param #arg"
     param-name ?= "__#{idx}"
     param-obj[param-name] = type
@@ -195,7 +193,6 @@ export function mk-user-func(conn, spec, source, cb)
 
   err, res <- conn.query _mk_func name, param-obj, rettype, body
   throw err if err
-  console.log res
 
   cb { rettype, name, param-obj, body }
 

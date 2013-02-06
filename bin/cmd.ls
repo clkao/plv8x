@@ -39,7 +39,7 @@ switch
 | argv.inject =>
   [spec, source] = argv.inject.split \=
   plv8x.mk-user-func conn, spec, source, ->
-    console.log it
+    console.log \ok spec
     done!
 | argv.purge =>
   plv8x.purge conn, ->
