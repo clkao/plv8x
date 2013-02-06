@@ -125,10 +125,6 @@ SET client_min_messages TO WARNING;
 DO \$PLV8X_EOF\$ BEGIN
 
 DROP FUNCTION IF EXISTS #{name} (#params);
-DROP FUNCTION IF EXISTS #{name} (#{
-  for p in params
-    if p is /plv8x_json/ then \json else p
-});
 EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;
 
 CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X_#name\$
