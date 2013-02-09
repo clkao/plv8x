@@ -46,7 +46,19 @@ DO $$ BEGIN
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
     else
-      # load with sql
+      /* translate this from perl using shelljs
+      my $dir = `pg_config --sharedir`;
+      chomp $dir;
+      use File::Glob qw(bsd_glob);
+      my @init_files = sort { $b cmp $a } bsd_glob("$dir/contrib/plv8*.sql");
+      if (@init_files > 1) {
+          warn "==> more than one version of plv8 found: ".join(',',@init_files);
+      }
+      eval {
+          $self->{dbh}->do(scalar read_file($init_files[0]));
+      };
+      $self->{dbh}->do('rollback') if $self->{dbh}->err;
+      */
 
     if pg_version < \9.2.0
       ..query '''
