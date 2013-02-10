@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS plv8x.code (
 export function bootstrap(conn, done)
   with conn
     (err, res) <- ..query "select version()"
+    ..query plv8x-sql!
     #->[0][0] =~ m/
     [_, pg_version] = res.rows.0.version.match /^PostgreSQL ([\d\.]+)/
     if pg_version >= \9.1.0
@@ -63,33 +64,33 @@ EXCEPTION WHEN OTHERS THEN END; $$;
     if pg_version < \9.2.0
       ..query '''
 DO $$ BEGIN
-    CREATE FUNCTION json_syntax_check(src text) RETURNS boolean AS '
+    CREATE FUNCTION plv8x.json_syntax_check(src text) RETURNS boolean AS '
         try { JSON.parse(src); return true; } catch (e) { return false; }
     ' LANGUAGE plv8 IMMUTABLE;
 EXCEPTION WHEN OTHERS THEN END; $$;
 
 DO $$ BEGIN
-    CREATE DOMAIN plv8x_json AS text CHECK ( json_syntax_check(VALUE) );
+    CREATE DOMAIN plv8x.json AS text CHECK ( plv8x.json_syntax_check(VALUE) );
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
     else
       ..query '''
 DO $$ BEGIN
-    CREATE DOMAIN plv8x_json AS json;
+    CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
     ..query '''
 DO $$ BEGIN
-    CREATE DOMAIN plv8x_json AS json;
+    CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
-    ..query _mk_func \plv8x_eval {str: \text} \text """
+    ..query _mk_func \plv8x.eval {str: \text} \text """
 function(str) {
     return eval(str)
 }
 """
-    ..query "select plv8x_eval($1)" ['plv8x_jsid = 0']
-    ..query _mk_func \plv8x_evalit {str: \text} \text """
+    ..query "select plv8x.eval($1)" ['plv8x_jsid = 0']
+    ..query _mk_func \plv8x.evalit {str: \text} \text """
 function (str) {
     ++plv8x_jsid;
     var id = "plv8x_jsid" + plv8x_jsid;
@@ -98,11 +99,10 @@ function (str) {
     return id;
 }
 """
-    ..query _mk_func \plv8x_boot {} \void plv8x-boot plv8x-require
-    ..query _mk_func \lscompile {str: \text, args: \plv8x_json} \text plv8x-lift "LiveScript", "compile"
-    ..query plv8x-sql!
-    ..query "select plv8x_boot()"
-    r = ..query _mk_func \plv8x_apply {str: \text, args: \plv8x_json} \plv8x_json """
+    ..query _mk_func \plv8x.boot {} \void plv8x-boot plv8x-require
+    ..query _mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x-lift "LiveScript", "compile"
+    ..query "select plv8x.boot()"
+    r = ..query _mk_func \plv8x.apply {str: \text, args: \plv8x.json} \plv8x.json """
 function (func, args) {
     return eval(func).apply(null, args);
 }
@@ -115,21 +115,21 @@ export function _mk_func (
   params = []
   args = for pname, type of param-obj
     params.push "#pname #type"
-    if type is \plv8x_json
+    if type is \plv8x.json
       "JSON.parse(#pname)"
     else pname
 
   if lang is \plls and not skip-compile
     lang = \plv8
     [{ compiled }] = plv8.execute do
-      'SELECT plv8x_apply($1, $2) AS compiled'
+      'SELECT plv8x.apply($1, $2) AS compiled'
       'LiveScript.compile'
       JSON.stringify [body, { +bare }]
     compiled -= /;$/
 
   compiled ||= body
   body = "(eval(#compiled))(#args)";
-  body = "JSON.stringify(#body)" if ret is \plv8x_json
+  body = "JSON.stringify(#body)" if ret is \plv8x.json
 
   return """
 
@@ -139,9 +139,9 @@ DO \$PLV8X_EOF\$ BEGIN
 DROP FUNCTION IF EXISTS #{name} (#params);
 EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;
 
-CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X_#name\$
+CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X__BODY__\$
 return #body;
-\$PLV8X_#name\$ LANGUAGE #lang IMMUTABLE STRICT;
+\$PLV8X__BODY__\$ LANGUAGE #lang IMMUTABLE STRICT;
   """
 
 
@@ -190,7 +190,7 @@ export function mk-user-func(conn, spec, source, cb)
 
   param-obj = {}
   for arg, idx in args.split /\s*,\s*/
-    [_, type, param-name] = arg.match /^(\w+)\s*(\w+)?$/ or throw "failed to parse param #arg"
+    [_, type, param-name] = arg.match /^([\.\w]+)\s*(\w+)?$/ or throw "failed to parse param #arg"
     param-name ?= "__#{idx}"
     param-obj[param-name] = type
 

@@ -17,29 +17,29 @@ describe 'db', -> ``it``
     1.should.be.ok
     done!
   .. 'eval', (done) ->
-    err, res <- conn.query "select plv8x_eval('plus_one = function(a) { return a + 1 }')"
+    err, res <- conn.query "select plv8x.eval('plus_one = function(a) { return a + 1 }')"
     expect(err).to.be.a('null');
-    err, res <- conn.query "select plv8x_apply($1, $2)" [\plus_one, JSON.stringify [42]]
+    err, res <- conn.query "select plv8x.apply($1, $2) as ret" [\plus_one, JSON.stringify [42]]
     expect err .to.be.a('null');
-    expect res.rows.0.plv8x_apply .to.equal(\43)
+    expect res.rows.0.ret .to.equal(\43)
     done!
   .. 'evalit', (done) ->
-    err, res <- conn.query "select plv8x_evalit('function(a) { return a + 1 }') as ret"
+    err, res <- conn.query "select plv8x.evalit('function(a) { return a + 1 }') as ret"
     expect(err).to.be.a('null');
     func = res.rows.0.ret
-    err, res <- conn.query "select plv8x_eval($1) as ret", ["typeof #func"]
+    err, res <- conn.query "select plv8x.eval($1) as ret", ["typeof #func"]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect ret .to.equal \function
-    err, res <- conn.query "select plv8x_apply($1, $2)" [func, JSON.stringify [42]]
+    err, res <- conn.query "select plv8x.apply($1, $2) as ret" [func, JSON.stringify [42]]
     expect err .to.be.a('null');
-    expect res.rows.0.plv8x_apply .to.equal \43
+    expect res.rows.0.ret .to.equal \43
     done!
   .. 'ls', (done) ->
     manifest = './node_modules/LiveScript/package.json'
     ls <- plv8x.bundle manifest
     # get require entrance for onejs bundles
-    err, res <- conn.query "select plv8x_evalit($1) as ret", ["""
+    err, res <- conn.query "select plv8x.evalit($1) as ret", ["""
 (function() {
     var module = {exports: {}};
     #ls;
@@ -48,7 +48,7 @@ describe 'db', -> ``it``
     """]
     expect(err).to.be.a \null
     req = res.rows.0.ret
-    err, res <- conn.query "select plv8x_apply($1, $2) as ret", [req, '["LiveScript"]']
+    err, res <- conn.query "select plv8x.apply($1, $2) as ret", [req, '["LiveScript"]']
     expect err .to.be.a \null
     ret = JSON.parse res.rows.0.ret
     expect ret .to.deep.equal { VERSION: '1.1.1' }
@@ -63,28 +63,28 @@ describe 'db', -> ``it``
     console.log it
     done!
   .. 'plv8x_require', (done) ->
-    err, res <- conn.query "select plv8x_eval($1) as ret", ["plv8x_require('LiveScript').VERSION"]
+    err, res <- conn.query "select plv8x.eval($1) as ret", ["plv8x_require('LiveScript').VERSION"]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect ret .to.equal \1.1.1
     done!
   .. 'lscompile', (done) ->
-    err, res <- conn.query "select lscompile($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
+    err, res <- conn.query "select plv8x.lscompile($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect (eval ret)! .to.equal 42
     done!
   .. 'mk-user-func', (done) ->
-    <- plv8x.mk-user-func conn, "text lsgo(text, plv8x_json)", ':-> plv8x_require "LiveScript" .compile ...'
+    <- plv8x.mk-user-func conn, "text lsgo(text, plv8x.json)", ':-> plv8x_require "LiveScript" .compile ...'
     err, res <- conn.query "select lsgo($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect (eval ret)! .to.equal 42
     done!
   .. 'required object persistency', (done) ->
-    err, res <- conn.query """select plv8x_eval('plv8x_require("LiveScript").xxx = 123')"""
+    err, res <- conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx = 123')"""
     expect(err).to.be.a('null');
-    err, res <- conn.query """select plv8x_eval('plv8x_require("LiveScript").xxx') as ret"""
+    err, res <- conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx') as ret"""
     expect err .to.be.a('null');
     {ret} = res.rows.0
     expect ret .to.equal \123
