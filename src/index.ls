@@ -1,7 +1,25 @@
+class PLX => (@conn) ->
+  <[ list purge importBundle deleteBundle mkUserFunc plv8xEval ]>.for-each !(key) ~>
+    @[key] = -> exports[key](@conn, ...arguments)
+  @eval = @plv8x-eval
+
+exports.new = (db, cb) ->
+  conn = connect db
+  <- bootstrap conn
+  <- conn.query 'select plv8x.boot()'
+  plx = new PLX conn
+  cb? plx
+
 export function connect(db)
   require! pg
-  with new pg.Client db
+  new pg.Client db
     ..connect!
+
+export function plv8x-eval(conn, code, cb)
+  code = "(#code)()" if typeof code is \function
+  err, rv <- conn.query "select plv8x.eval($1)", [code]
+  throw err if err
+  cb? rv
 
 export function plv8x-sql
   """
