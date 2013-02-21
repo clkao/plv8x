@@ -21,7 +21,11 @@ export function plv8x-eval(conn, code, cb)
   throw err if err
   cb? rv
 
-export function plv8x-sql
+export function define-schema(name, comment, drop, cascade)
+  dodrop = if drop => """
+    ELSE EXECUTE 'DROP SCHEMA #name #{if cascade => 'CASCADE' else ''};
+         CREATE SCHEMA #name';""" else ""
+
   """
 DO $$
 BEGIN
@@ -29,17 +33,22 @@ BEGIN
     IF NOT EXISTS(
         SELECT schema_name
           FROM information_schema.schemata
-          WHERE schema_name = 'plv8x'
+          WHERE schema_name = '#name'
       )
     THEN
-      EXECUTE 'CREATE SCHEMA plv8x';
+      EXECUTE 'CREATE SCHEMA #name';
+    #dodrop
     END IF;
 
 END
 
 $$;
 
-COMMENT ON SCHEMA plv8x IS 'Out-of-table for loading plv8 modules';
+COMMENT ON SCHEMA #name IS '#comment';
+  """
+
+export function plv8x-sql(drop=false, cascade=false)
+  define-schema(\plv8x 'Out-of-table for loading plv8 modules', drop, cascade) + """
 
 CREATE TABLE IF NOT EXISTS plv8x.code (
     name text,
@@ -49,10 +58,13 @@ CREATE TABLE IF NOT EXISTS plv8x.code (
 );
   """
 
-export function bootstrap(conn, done)
+export function bootstrap(conn, drop, cascade, done)
+  if typeof drop is \function
+    done = drop
+    drop = false
   with conn
     (err, res) <- ..query "select version()"
-    ..query plv8x-sql!
+    ..query plv8x-sql drop, cascade
     #->[0][0] =~ m/
     [_, pg_version] = res.rows.0.version.match /^PostgreSQL ([\d\.]+)/
     if pg_version >= \9.1.0

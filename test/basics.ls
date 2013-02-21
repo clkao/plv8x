@@ -13,7 +13,7 @@ describe 'db', -> ``it``
     conn.should.be.ok
     done!
   .. 'bootstrap', (done) ->
-    <- plv8x.bootstrap conn
+    <- plv8x.bootstrap conn, true, true
     1.should.be.ok
     done!
   .. 'eval', (done) ->
