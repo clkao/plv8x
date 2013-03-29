@@ -1,7 +1,8 @@
 class PLX => (@conn) ->
-  <[ list purge importBundle deleteBundle mkUserFunc plv8xEval ]>.for-each !(key) ~>
+  <[ list purge importBundle deleteBundle mkUserFunc plv8xEval plv8xApply]>.for-each !(key) ~>
     @[key] = -> exports[key](@conn, ...arguments)
   @eval = @plv8x-eval
+  @ap = @plv8x-apply
 
 exports.new = (db, cb) ->
   conn = connect db
@@ -18,6 +19,13 @@ export function connect(db)
 export function plv8x-eval(conn, code, cb)
   code = "(#code)()" if typeof code is \function
   err, rv <- conn.query "select plv8x.eval($1)", [code]
+  throw err if err
+  cb? rv
+
+export function plv8x-apply(conn, code, args, cb)
+  code = "#code" if typeof code is \function
+  args = JSON.stringify args if typeof args isnt \string
+  err, rv <- conn.query "select plv8x.apply($1, $2)", [code, args]
   throw err if err
   cb? rv
 
