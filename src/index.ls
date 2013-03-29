@@ -23,7 +23,7 @@ export function plv8x-eval(conn, code, cb)
   cb? rv
 
 export function plv8x-apply(conn, code, args, cb)
-  code = "#code" if typeof code is \function
+  code = "(#code)()" if typeof code is \function
   args = JSON.stringify args if typeof args isnt \string
   err, rv <- conn.query "select plv8x.apply($1, $2)", [code, args]
   throw err if err
