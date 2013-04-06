@@ -32,10 +32,13 @@ class PLX
   delete-bundle: (name, cb) ->
     @query "delete from plv8x.code where name = $1" [name], -> cb it.rows
 
-  _bundle: (manifest, cb) ->
+  _bundle: (name, manifest, cb) ->
     require! one
     one.quiet true
-    err, bundle <~ one.build manifest, {-debug, exclude: <[one pg]>}
+    exclude = <[one pg]>
+    # once we get cross-dist loading, avoid duplicated plv8x
+    # if name is \plv8x => exclude.push that
+    err, bundle <~ one.build manifest, {-debug, exclude}
     throw err if err
 
     # XXX
@@ -43,13 +46,12 @@ class PLX
     cb bundle
 
   import-bundle: (name, manifest, cb) ->
-    bundle_from = (m, cb) ~>
+    bundle_from = (name, m, cb) ~>
       if m is /\.js$/
         cb (require \fs .readFileSync m, \utf8)
       else
-        @_bundle m, cb
-    code <~ bundle_from manifest
-    console.log code.length
+        @_bundle name, m, cb
+    code <~ bundle_from name, manifest
     rows <~ @query "select name from plv8x.code where name = $1" [name]
     [q, bind] = if rows.length # udpate
       ["update plv8x.code set name = $1, code = $2" [name, code]]
@@ -91,6 +93,7 @@ exports.new = (db, cb) ->
   plx = new PLX conn
   <- plx.bootstrap
   <- plx.query 'select plv8x.boot()'
+  <- plx.import-bundle \plv8x require.resolve \../package.json
   cb? plx
 
 export function connect(db)

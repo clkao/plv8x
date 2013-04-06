@@ -24,8 +24,8 @@ dependencies:
   pg: \0.11.x
   resolve: \0.2.x
   one: '1.8.x'
+  LiveScript: \1.1.1
 devDependencies:
   mocha: \*
   chai: \*
-  LiveScript: \1.1.1
 optionalDependencies: {}
