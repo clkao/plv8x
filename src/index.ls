@@ -132,6 +132,7 @@ CREATE TABLE IF NOT EXISTS plv8x.code (
     updated timestamp
 );
   """
+
 export function _mk_func (
   name, param-obj, ret, body, lang = \plv8, skip-compile
 )
@@ -181,7 +182,7 @@ export function plv8x-lift(module, func-name)
   }
   """
 
-plv8x-require = (name) ->
+export function plv8x-require(name)
   ``if (typeof plv8x_global == 'undefined') plv8x_global = {}``
   return plv8x_global[name] if plv8x_global[name]?
 
@@ -205,5 +206,3 @@ plv8x-require = (name) ->
         break
       err := e
   plv8.elog WARNING, "failed to load module #name: #err"
-
-module.exports.plv8x-require = plv8x-require
