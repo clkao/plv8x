@@ -1,8 +1,90 @@
-class PLX => (@conn) ->
-  <[ list purge importBundle deleteBundle mkUserFunc plv8xEval plv8xApply]>.for-each !(key) ~>
-    @[key] = -> exports[key](@conn, ...arguments)
-  @eval = @plv8x-eval
-  @ap = @plv8x-apply
+class PLX
+  (@conn) ->
+    @eval = @plv8x-eval
+    @ap = @plv8x-apply
+
+  plv8x-eval: (code, cb) ->
+    code = "(#code)()" if typeof code is \function
+    err, rv <~ @conn.query "select plv8x.eval($1)", [code]
+    throw err if err
+    cb? rv
+
+  plv8x-apply: (conn, code, args, cb) ->
+    code = "(#code)()" if typeof code is \function
+    args = JSON.stringify args if typeof args isnt \string
+    err, rv <- conn.query "select plv8x.apply($1, $2)", [code, args]
+    throw err if err
+    cb? rv
+
+  list: (cb) ->
+    (err, res) <~ @conn.query "select * from plv8x.code"
+    cb res.rows
+
+  purge: (cb) ->
+    (err, res) <~ @conn.query "delete from plv8x.code"
+    cb res.rows
+
+  _bundle: (manifest, cb) ->
+    require! one
+    one.quiet true
+    err, bundle <~ one.build manifest, {-debug, exclude: <[one pg]>}
+    throw err if err
+
+    # XXX
+    delete global.key
+    cb bundle
+
+  delete-bundle: (name, cb) ->
+    err, res <~ @conn.query "delete from plv8x.code where name = $1" [name]
+    throw err if err
+    cb res.rows
+
+  import-bundle: (name, manifest, cb) ->
+    bundle_from = (m, cb) ~>
+      if m is /\.js$/
+        cb (require \fs .readFileSync m, \utf8)
+      else
+        @_bundle m, cb
+    code <~ bundle_from manifest
+    console.log code.length
+    err, res <~ @conn.query "select name from plv8x.code where name = $1" [name]
+    [q, bind] = if res.rows.length # udpate
+      ["update plv8x.code set name = $1, code = $2" [name, code]]
+    else
+      ["insert into plv8x.code (name, code) values($1, $2)" [name, code]]
+    err, res <~ @conn.query q, bind
+    throw err if err
+    cb res.rows
+
+  mk-user-func: (spec, source, cb) ->
+    [_, rettype, name, args] = spec.match /^(\w+)?\s*(\w+)\((.*)\)$/ or throw "failed to parse #spec"
+
+    param-obj = {}
+    for arg, idx in args.split /\s*,\s*/
+      [_, type, param-name] = arg.match /^([\.\w]+)\s*(\w+)?$/ or throw "failed to parse param #arg"
+      param-name ?= "__#{idx}"
+      param-obj[param-name] = type
+
+    [_, pkg, expression] = source.match /^(\w*):(.*)$/ or throw "failed to parse source #source"
+
+    body = if pkg
+      plv8x-lift pkg, expression
+    else if expression.match /^function/
+      expression
+    else
+      (require \LiveScript .compile expression, {+bare}) - /;$/
+
+    err, res <~ @conn.query _mk_func name, param-obj, rettype, body
+    throw err if err
+
+    cb { rettype, name, param-obj, body }
+
+
+<[ plv8xEval importBundle list purge deleteBundle mkUserFunc ]>.for-each !(key) ~>
+    exports[key] = (conn, ...rest) ->
+      console.error 'deprecated api, use PLX instead'
+      plx = new PLX conn
+      plx[key] ...rest
 
 exports.new = (db, cb) ->
   conn = connect db
@@ -15,19 +97,6 @@ export function connect(db)
   require! pg
   new pg.Client db
     ..connect!
-
-export function plv8x-eval(conn, code, cb)
-  code = "(#code)()" if typeof code is \function
-  err, rv <- conn.query "select plv8x.eval($1)", [code]
-  throw err if err
-  cb? rv
-
-export function plv8x-apply(conn, code, args, cb)
-  code = "(#code)()" if typeof code is \function
-  args = JSON.stringify args if typeof args isnt \string
-  err, rv <- conn.query "select plv8x.apply($1, $2)", [code, args]
-  throw err if err
-  cb? rv
 
 export function define-schema(name, comment, drop, cascade)
   dodrop = if drop => """
@@ -176,70 +245,6 @@ CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X__BODY__\$
 return #body;
 \$PLV8X__BODY__\$ LANGUAGE #lang IMMUTABLE STRICT;
   """
-
-
-export function list(conn, cb)
-  (err, res) <- conn.query "select * from plv8x.code"
-  cb res.rows
-
-export function purge(conn, cb)
-  (err, res) <- conn.query "delete from plv8x.code"
-  cb res.rows
-
-export function bundle(manifest, cb)
-  require! one
-  one.quiet true
-  err, bundle <- one.build manifest, {-debug, exclude: <[one pg]>}
-  throw err if err
-
-  # XXX
-  delete global.key
-  cb bundle
-
-export function delete-bundle(conn, name, cb)
-  err, res <- conn.query "delete from plv8x.code where name = $1" [name]
-  throw err if err
-  cb res.rows
-
-export function import-bundle(conn, name, manifest, cb)
-  bundle_from = (m, cb) ->
-    if m is /\.js$/
-      cb (require \fs .readFileSync m, \utf8)
-    else
-      bundle m, cb
-  code <- bundle_from manifest
-  console.log code.length
-  err, res <- conn.query "select name from plv8x.code where name = $1" [name]
-  [q, bind] = if res.rows.length # udpate
-    ["update plv8x.code set name = $1, code = $2" [name, code]]
-  else
-    ["insert into plv8x.code (name, code) values($1, $2)" [name, code]]
-  err, res <- conn.query q, bind
-  throw err if err
-  cb res.rows
-
-export function mk-user-func(conn, spec, source, cb)
-  [_, rettype, name, args] = spec.match /^(\w+)?\s*(\w+)\((.*)\)$/ or throw "failed to parse #spec"
-
-  param-obj = {}
-  for arg, idx in args.split /\s*,\s*/
-    [_, type, param-name] = arg.match /^([\.\w]+)\s*(\w+)?$/ or throw "failed to parse param #arg"
-    param-name ?= "__#{idx}"
-    param-obj[param-name] = type
-
-  [_, pkg, expression] = source.match /^(\w*):(.*)$/ or throw "failed to parse source #source"
-
-  body = if pkg
-    plv8x-lift pkg, expression
-  else if expression.match /^function/
-    expression
-  else
-    (require \LiveScript .compile expression, {+bare}) - /;$/
-
-  err, res <- conn.query _mk_func name, param-obj, rettype, body
-  throw err if err
-
-  cb { rettype, name, param-obj, body }
 
 export function plv8x-boot(body)
   """

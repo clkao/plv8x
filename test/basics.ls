@@ -35,24 +35,6 @@ describe 'db', -> ``it``
     expect err .to.be.a('null');
     expect res.rows.0.ret .to.equal \43
     done!
-  .. 'ls', (done) ->
-    manifest = './node_modules/LiveScript/package.json'
-    ls <- plv8x.bundle manifest
-    # get require entrance for onejs bundles
-    err, res <- conn.query "select plv8x.evalit($1) as ret", ["""
-(function() {
-    var module = {exports: {}};
-    #ls;
-    return module.exports.require;
-})()
-    """]
-    expect(err).to.be.a \null
-    req = res.rows.0.ret
-    err, res <- conn.query "select plv8x.apply($1, $2) as ret", [req, '["LiveScript"]']
-    expect err .to.be.a \null
-    ret = JSON.parse res.rows.0.ret
-    expect ret .to.deep.equal { VERSION: '1.1.1' }
-    done!
   .. 'purge', (done) ->
     <- plv8x.purge conn
     done!
