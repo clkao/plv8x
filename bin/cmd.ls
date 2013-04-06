@@ -24,30 +24,29 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
   if process.argv.length <= 2 then throw 'Specify a parameter.'
 .argv
 
-conn = plv8x.connect argv.db
-<- plv8x.bootstrap conn
+plx <- plv8x.new argv.db
 
-done = -> conn.end!
+done = -> plx.end!
 
 switch
 | argv.import =>
-  plv8x.import-bundle conn, ...argv.import.split(\:), ->
+  plx.import-bundle ...argv.import.split(\:), ->
     done!
 | argv.delete =>
-  plv8x.delete-bundle conn, argv.delete, ->
+  plx.delete-bundle argv.delete, ->
     done!
 | argv.inject =>
   [spec, source] = argv.inject.split \=
-  plv8x.mk-user-func conn, spec, source, ->
+  plx.mk-user-func spec, source, ->
     console.log \ok spec
     done!
 | argv.purge =>
-  plv8x.purge conn, ->
+  plx.purge ->
     console.log it
     done!
 | argv.list =>
-  plv8x.list conn, (res) ->
-    for {name, code} in res
-      console.log "#name: #{code.length} bytes"
+  plx.list (res) ->
+    for {name, length} in res
+      console.log "#name: #{length} bytes"
     done!
 | otherwise => console.log "Unknown command: #{argv._.0}"; done!

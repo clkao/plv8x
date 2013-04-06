@@ -24,7 +24,7 @@ class PLX
     @query "select plv8x.apply($1, $2)", [code, args], cb
 
   list: (cb) ->
-    @query "select * from plv8x.code", cb
+    @query "select name, length(code) as length from plv8x.code", cb
 
   purge: (cb) ->
     @query "delete from plv8x.code", cb
