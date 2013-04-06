@@ -56,7 +56,7 @@ class PLX
     @query q, bind, cb
 
   mk-user-func: (spec, source, cb) ->
-    [_, rettype, name, args] = spec.match /^(\w+)?\s*(\w+)\((.*)\)$/ or throw "failed to parse #spec"
+    [_, rettype, name, args] = spec.match /^([\.\w]+)?\s*(\w+)\((.*)\)$/ or throw "failed to parse #spec"
 
     param-obj = {}
     for arg, idx in args.split /\s*,\s*/
@@ -73,7 +73,7 @@ class PLX
     else
       (require \LiveScript .compile expression, {+bare}) - /;$/
 
-    <~ @query _mk_func(name, param-obj, rettype, body)
+    <~ @query _mk_func name, param-obj, rettype, body
 
     cb { rettype, name, param-obj, body }
 
