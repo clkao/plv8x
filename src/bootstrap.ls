@@ -1,12 +1,13 @@
-{plv8x-sql, _mk_func, plv8x-boot, plv8x-require, plv8x-lift} = require \..
+{_mk_func, plv8x-boot, plv8x-require, plv8x-lift} = require \..
+{plv8x-sql} = require \./sql
 
 module.exports = (drop, cascade, done) ->
   if typeof drop is \function
     done = drop
     drop = false
 
-  with @conn
-    rows <~ @query "select version()"
+  rows <~ @query "select version()"
+  @conn
     ..query plv8x-sql drop, cascade
 
     [_, pg_version] = rows.0.version.match /^PostgreSQL ([\d\.]+)/
@@ -52,6 +53,7 @@ DO $$ BEGIN
     CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
+  @conn
     ..query _mk_func \plv8x.boot {} \void plv8x-boot plv8x-require
     ..query _mk_func \plv8x.eval {str: \text} \text _eval
     ..query _mk_func \plv8x.apply {str: \text, args: \plv8x.json} \plv8x.json _apply
