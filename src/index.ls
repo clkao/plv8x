@@ -6,6 +6,8 @@ class PLX
   bootstrap: (...args) ->
     require \./bootstrap .apply @, args
 
+  end: -> @conn.end!
+
   query: (...args) ->
     cb = args.pop!
     err, {rows}? <- @conn.query ...args
