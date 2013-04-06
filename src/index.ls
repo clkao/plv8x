@@ -3,26 +3,29 @@ class PLX
     @eval = @plv8x-eval
     @ap = @plv8x-apply
 
+  query: (...args) ->
+    cb = args.pop!
+    err, {rows}? <- @conn.query ...args
+    throw err if err
+    cb? rows
+
   plv8x-eval: (code, cb) ->
     code = "(#code)()" if typeof code is \function
-    err, rv <~ @conn.query "select plv8x.eval($1)", [code]
-    throw err if err
-    cb? rv
+    @query "select plv8x.eval($1)", [code], cb
 
-  plv8x-apply: (conn, code, args, cb) ->
+  plv8x-apply: (code, args, cb) ->
     code = "(#code)()" if typeof code is \function
     args = JSON.stringify args if typeof args isnt \string
-    err, rv <- conn.query "select plv8x.apply($1, $2)", [code, args]
-    throw err if err
-    cb? rv
+    @query "select plv8x.apply($1, $2)", [code, args], cb
 
   list: (cb) ->
-    (err, res) <~ @conn.query "select * from plv8x.code"
-    cb res.rows
+    @query "select * from plv8x.code", cb
 
   purge: (cb) ->
-    (err, res) <~ @conn.query "delete from plv8x.code"
-    cb res.rows
+    @query "delete from plv8x.code", cb
+
+  delete-bundle: (name, cb) ->
+    @query "delete from plv8x.code where name = $1" [name], -> cb it.rows
 
   _bundle: (manifest, cb) ->
     require! one
@@ -34,11 +37,6 @@ class PLX
     delete global.key
     cb bundle
 
-  delete-bundle: (name, cb) ->
-    err, res <~ @conn.query "delete from plv8x.code where name = $1" [name]
-    throw err if err
-    cb res.rows
-
   import-bundle: (name, manifest, cb) ->
     bundle_from = (m, cb) ~>
       if m is /\.js$/
@@ -47,14 +45,12 @@ class PLX
         @_bundle m, cb
     code <~ bundle_from manifest
     console.log code.length
-    err, res <~ @conn.query "select name from plv8x.code where name = $1" [name]
-    [q, bind] = if res.rows.length # udpate
+    rows <~ @query "select name from plv8x.code where name = $1" [name]
+    [q, bind] = if rows.length # udpate
       ["update plv8x.code set name = $1, code = $2" [name, code]]
     else
       ["insert into plv8x.code (name, code) values($1, $2)" [name, code]]
-    err, res <~ @conn.query q, bind
-    throw err if err
-    cb res.rows
+    @query q, bind, cb
 
   mk-user-func: (spec, source, cb) ->
     [_, rettype, name, args] = spec.match /^(\w+)?\s*(\w+)\((.*)\)$/ or throw "failed to parse #spec"
@@ -74,8 +70,7 @@ class PLX
     else
       (require \LiveScript .compile expression, {+bare}) - /;$/
 
-    err, res <~ @conn.query _mk_func name, param-obj, rettype, body
-    throw err if err
+    <~ @query _mk_func(name, param-obj, rettype, body)
 
     cb { rettype, name, param-obj, body }
 
