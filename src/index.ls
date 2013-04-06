@@ -117,11 +117,6 @@ DO $$ BEGIN
     CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
-    ..query '''
-DO $$ BEGIN
-    CREATE DOMAIN plv8x.json AS json;
-EXCEPTION WHEN OTHERS THEN END; $$;
-'''
     ..query _mk_func \plv8x.eval {str: \text} \text """
 function(str) {
     return eval(str)
