@@ -24,14 +24,7 @@ describe 'db', -> ``it``
     expect res.rows.0.ret .to.equal(\43)
     done!
   .. 'evalit', (done) ->
-    err, res <- conn.query "select plv8x.evalit('function(a) { return a + 1 }') as ret"
-    expect(err).to.be.a('null');
-    func = res.rows.0.ret
-    err, res <- conn.query "select plv8x.eval($1) as ret", ["typeof #func"]
-    expect(err).to.be.a('null');
-    {ret} = res.rows.0
-    expect ret .to.equal \function
-    err, res <- conn.query "select plv8x.apply($1, $2) as ret" [func, JSON.stringify [42]]
+    err, res <- conn.query "select plv8x.apply($1, $2) as ret" ['function(a) { return a + 1}', JSON.stringify [42]]
     expect err .to.be.a('null');
     expect res.rows.0.ret .to.equal \43
     done!
@@ -51,6 +44,7 @@ describe 'db', -> ``it``
     expect ret .to.equal \1.1.1
     done!
   .. 'lscompile', (done) ->
+    conn.query plv8x._mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x.plv8x-lift "LiveScript", "compile"
     err, res <- conn.query "select plv8x.lscompile($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
     expect(err).to.be.a('null');
     {ret} = res.rows.0

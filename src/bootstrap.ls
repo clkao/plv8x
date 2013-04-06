@@ -52,29 +52,14 @@ DO $$ BEGIN
     CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
-    ..query _mk_func \plv8x.eval {str: \text} \text """
-function(str) {
-    return eval(str)
-}
-"""
-    ..query "select plv8x.eval($1)" ['plv8x_jsid = 0']
-    ..query _mk_func \plv8x.evalit {str: \text} \text """
-function (str) {
-    ++plv8x_jsid;
-    var id = "plv8x_jsid" + plv8x_jsid;
-    var body = id + " = (function() {return (" + str + ");})()";
-    var ret = eval(body);
-    return id;
-}
-"""
     ..query _mk_func \plv8x.boot {} \void plv8x-boot plv8x-require
-    ..query _mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x-lift "LiveScript", "compile"
-    ..query "select plv8x.boot()"
-    r = ..query _mk_func \plv8x.apply {str: \text, args: \plv8x.json} \plv8x.json """
-function (func, args) {
-    return eval(func).apply(null, args);
-}
-"""
+    ..query _mk_func \plv8x.eval {str: \text} \text _eval
+    ..query _mk_func \plv8x.apply {str: \text, args: \plv8x.json} \plv8x.json _apply
+    r = ..query "select plv8x.boot()"
     r.on \end done
 
+_eval = (str) -> eval str
 
+_apply = (func, args) ->
+  func = "(function() {return (#func);})()"
+  eval func .apply null args
