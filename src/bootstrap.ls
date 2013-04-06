@@ -1,4 +1,4 @@
-{_mk_func, plv8x-boot, plv8x-require, plv8x-lift} = require \..
+{_mk_func} = require \..
 {plv8x-sql} = require \./sql
 
 module.exports = (drop, cascade, done) ->
@@ -54,7 +54,7 @@ DO $$ BEGIN
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
   @conn
-    ..query _mk_func \plv8x.boot {} \void plv8x-boot plv8x-require
+    ..query _mk_func \plv8x.boot {} \void _boot
     ..query _mk_func \plv8x.eval {str: \text} \text _eval
     ..query _mk_func \plv8x.apply {str: \text, args: \plv8x.json} \plv8x.json _apply
     r = ..query "select plv8x.boot()"
@@ -65,3 +65,40 @@ _eval = (str) -> eval str
 _apply = (func, args) ->
   func = "(function() {return (#func);})()"
   eval func .apply null args
+
+_require = (name) ->
+  return plv8x.global[name] if plv8x.global[name]?
+
+  res = plv8.execute "select name, code from plv8x.code", []
+  x = {}
+  err = ''
+  for {code,name:bundle} in res
+    try
+      loader = """
+(function() {
+    var module = {exports: {}};
+    #code;
+    return module.exports.require;
+})()
+"""
+      req = eval loader
+      module = req name
+      return plv8x.global[name] = module if module?
+    catch e
+      if e isnt /Cannot find module/
+        break
+      err := e
+  plv8.elog WARNING, "failed to load module #name: #err"
+
+_boot =
+  """
+  function() {
+    if (typeof plv8x == 'undefined')
+      plv8x = {
+        global: {},
+        require: #{_require.toString!replace /(['\\])/g, '\$1'}
+      };
+      plv8x_require = plv8x.require
+  }
+  """
+

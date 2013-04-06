@@ -131,41 +131,10 @@ return #body;
 \$PLV8X__BODY__\$ LANGUAGE #lang IMMUTABLE STRICT;
   """
 
-export function plv8x-boot(body)
-  """
-  function() { plv8x_require = #{body.toString!replace /(['\\])/g, '\$1'} }
-  """
-
 export function plv8x-lift(module, func-name)
-  body = plv8x-require
   """
   function() {
-    plv8x_require = #{body.toString!replace /(['\\])/g, '\$1'};
-    return plv8x_require('#{module}').#{func-name}.apply(null, arguments);
+    plv8.execute("select plv8x.boot()", []);
+    return plv8x.require('#{module}').#{func-name}.apply(null, arguments);
   }
   """
-
-export function plv8x-require(name)
-  ``if (typeof plv8x_global == 'undefined') plv8x_global = {}``
-  return plv8x_global[name] if plv8x_global[name]?
-
-  res = plv8.execute "select name, code from plv8x.code", []
-  x = {}
-  err = ''
-  for {code,name:bundle} in res
-    try
-      loader = """
-(function() {
-    var module = {exports: {}};
-    #code;
-    return module.exports.require;
-})()
-"""
-      req = eval loader
-      module = req name
-      return plv8x_global[name] = module if module?
-    catch e
-      if e isnt /Cannot find module/
-        break
-      err := e
-  plv8.elog WARNING, "failed to load module #name: #err"
