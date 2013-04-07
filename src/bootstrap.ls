@@ -57,6 +57,30 @@ EXCEPTION WHEN OTHERS THEN END; $$;
     ..query _mk_func \plv8x.boot {} \void _boot
     ..query _mk_func \plv8x.eval {str: \text} \text _eval
     ..query _mk_func \plv8x.apply {str: \text, args: \plv8x.json} \plv8x.json _apply
+    ..query _mk_func \plv8x.json_eval {code: \text} \plv8x.json (code) ->
+      JSON.stringify eval("(function(){return #code})").apply(this)
+    ..query _mk_func \plv8x.json_eval {data: \plv8x.json, code: \text} \plv8x.json (data, code) ->
+      JSON.stringify eval("(function(){return #code})").apply(JSON.parse data)
+    ..query _mk_func \plv8x.json_eval {code: \text, data: \plv8x.json} \plv8x.json (code, data) ->
+      JSON.stringify eval("(function(){return #code})").apply(JSON.parse data)
+    ..query '''
+DROP OPERATOR IF EXISTS |> (text); CREATE OPERATOR |> (
+    RIGHTARG = text,
+    PROCEDURE = plv8x.json_eval
+);
+DROP OPERATOR IF EXISTS |> (plv8x.json, text); CREATE OPERATOR |> (
+    LEFTARG = plv8x.json,
+    RIGHTARG = text,
+    COMMUTATOR = <|,
+    PROCEDURE = plv8x.json_eval
+);
+DROP OPERATOR IF EXISTS <| (text, plv8x.json); CREATE OPERATOR <| (
+    LEFTARG = text,
+    RIGHTARG = plv8x.json,
+    COMMUTATOR = |>,
+    PROCEDURE = plv8x.json_eval
+);
+'''
     r = ..query "select plv8x.boot()"
     r.on \end done
 
