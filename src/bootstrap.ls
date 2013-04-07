@@ -112,10 +112,10 @@ _require = (name) ->
   plv8.elog WARNING, "failed to load module #name: #err"
 
 _mk_json_eval = (type=1) -> match type
-  | (> 0)
-    (code, data) -> eval "(function(){return #code})" .apply(data)
-  | (< 0)
-    (data, code) -> eval "(function(){return #code})" .apply(data)
+  | (> 0) => (code, data) ->
+    eval plv8x.xpression-to-body code .apply data
+  | (< 0) => (data, code) ->
+    eval plv8x.xpression-to-body code .apply data
   | otherwise => (code) ->
     eval plv8x.xpression-to-body code .apply @
 

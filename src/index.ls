@@ -105,9 +105,10 @@ export function xpression-to-body(code)
   else
     plv8x.compile-livescript
   match code
-  | /^(->)/      => cls code # XXX: coffee
-  | /^\s*(@|~>)/ => cls code
+  | /^\s*->/     => cls code # XXX: coffee
+  | /^\s*~>/     => cls code.replace /~>/ \->
   | /^function/  => "(#code)"
+  | /^\s*@/      => cls "-> #code"
   | otherwise    => "(function(){return #code})"
 
 export function compile-livescript(expression)
