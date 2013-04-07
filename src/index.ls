@@ -72,12 +72,13 @@ class PLX
 
     body = if pkg
       plv8x-lift pkg, expression
+      boot = true
     else if expression.match /^function/
       expression
     else
       (require \LiveScript .compile expression, {+bare}) - /;$/
 
-    <~ @query _mk_func name, param-obj, rettype, body
+    <~ @query _mk_func name, param-obj, rettype, body, {boot}
 
     cb { rettype, name, param-obj, body }
 
@@ -102,7 +103,7 @@ export function connect(db)
     ..connect!
 
 export function _mk_func (
-  name, param-obj, ret, body, {lang = \plv8, skip-compile, cascade} = {}
+  name, param-obj, ret, body, {lang = \plv8, skip-compile, cascade, boot} = {}
 )
   params = []
   args = for pname, type of param-obj
@@ -122,6 +123,9 @@ export function _mk_func (
   compiled ||= body
   body = "(eval(#compiled))(#args)";
   body = "JSON.stringify(#body)" if ret is \plv8x.json
+  boot = if boot
+    "if (typeof plv8x == 'undefined') plv8.execute('select plv8x.boot()', []);"
+  else ''
 
   return """
 
@@ -132,6 +136,7 @@ DROP FUNCTION IF EXISTS #{name} (#params) #{if cascade => 'CASCADE' else ''};
 EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;
 
 CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X__BODY__\$
+#boot;
 return #body;
 \$PLV8X__BODY__\$ LANGUAGE #lang IMMUTABLE STRICT;
   """
@@ -139,7 +144,6 @@ return #body;
 export function plv8x-lift(module, func-name)
   """
   function() {
-    plv8.execute("select plv8x.boot()", []);
     return plv8x.require('#{module}').#{func-name}.apply(null, arguments);
   }
   """
