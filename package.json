@@ -29,7 +29,7 @@
     "resolve": "0.2.x",
     "one": "1.8.2",
     "LiveScript": "1.1.1",
-    "coffee-script": "1.6.2"
+    "coffee-script": "*"
   },
   "devDependencies": {
     "mocha": "*",

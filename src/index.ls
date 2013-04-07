@@ -54,7 +54,7 @@ class PLX
     code <~ bundle_from name, manifest
     rows <~ @query "select name from plv8x.code where name = $1" [name]
     [q, bind] = if rows.length # udpate
-      ["update plv8x.code set name = $1, code = $2" [name, code]]
+      ["update plv8x.code set code = $2 where name = $1" [name, code]]
     else
       ["insert into plv8x.code (name, code) values($1, $2)" [name, code]]
     @query q, bind, cb

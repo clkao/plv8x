@@ -1,66 +1,67 @@
 should = (require \chai).should!
 
 expect = (require \chai).expect
-var plv8x, conn
+var plx, plv8x, conString
 describe 'db', -> ``it``
   .. 'loaded successfully.', (done) ->
     # Load home page
-    conString = "tcp://localhost/#{ process.env.TESTDBNAME }"
+    conString := "tcp://localhost/#{ process.env.TESTDBNAME }"
     console.log conString
     plv8x := require \..
     plv8x.should.be.ok
-    conn := plv8x.connect conString
-    conn.should.be.ok
-    done!
-  .. 'bootstrap', (done) ->
-    <- plv8x.bootstrap conn, true, true
-    1.should.be.ok
+    _plx <- plv8x.new conString
+    plx := _plx
+    plx.should.be.ok
     done!
   .. 'eval', (done) ->
-    err, res <- conn.query "select plv8x.eval('plus_one = function(a) { return a + 1 }')"
-    expect(err).to.be.a('null');
-    err, res <- conn.query "select plv8x.apply($1, $2) as ret" [\plus_one, JSON.stringify [42]]
-    expect err .to.be.a('null');
-    expect res.rows.0.ret .to.equal(\43)
+    <- plx.query "select plv8x.eval('plus_one = function(a) { return a + 1 }')"
+    rows <- plx.query "select plv8x.apply($1, $2) as ret" [\plus_one, JSON.stringify [42]]
+    expect rows.0.ret .to.equal(\43)
     done!
   .. 'evalit', (done) ->
-    err, res <- conn.query "select plv8x.apply($1, $2) as ret" ['function(a) { return a + 1}', JSON.stringify [42]]
-    expect err .to.be.a('null');
-    expect res.rows.0.ret .to.equal \43
+    rows <- plx.query "select plv8x.apply($1, $2) as ret" ['function(a) { return a + 1}', JSON.stringify [42]]
+    expect rows.0.ret .to.equal \43
     done!
   .. 'purge', (done) ->
-    <- plv8x.purge conn
+    <- plx.purge
+    <- plv8x.new conString
+    res <- plx.list
+    expect [name for {name} in res] .to.be.deep.equal <[plv8x]>
     done!
   .. 'import', (done) ->
-    <- plv8x.import-bundle conn, \LiveScript, './node_modules/LiveScript/package.json'
-    console.log it
-    <- plv8x.import-bundle conn, \plv8x, './package.json'
-    console.log it
+    <- plx.import-bundle \LiveScript, './node_modules/LiveScript/package.json'
+    res <- plx.list
+    expect [name for {name} in res] .to.be.deep.equal <[plv8x LiveScript]>
+    done!
+  .. 'import existing', (done) ->
+    <- plx.import-bundle \LiveScript, './node_modules/LiveScript/package.json'
+    res <- plx.list
+    expect [name for {name} in res] .to.be.deep.equal <[plv8x LiveScript]>
     done!
   .. 'plv8x_require', (done) ->
-    err, res <- conn.query "select plv8x.eval($1) as ret", ["plv8x_require('LiveScript').VERSION"]
+    err, res <- plx.conn.query "select plv8x.eval($1) as ret", ["plv8x_require('LiveScript').VERSION"]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect ret .to.equal \"1.1.1"
     done!
   .. 'lscompile', (done) ->
-    conn.query plv8x._mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x.plv8x-lift "LiveScript", "compile"
-    err, res <- conn.query "select plv8x.lscompile($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
+    plx.conn.query plv8x._mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x.plv8x-lift "LiveScript", "compile"
+    err, res <- plx.conn.query "select plv8x.lscompile($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect (eval ret)! .to.equal 42
     done!
   .. 'mk-user-func', (done) ->
-    <- plv8x.mk-user-func conn, "text lsgo(text, plv8x.json)", ':-> plv8x_require "LiveScript" .compile ...'
-    err, res <- conn.query "select lsgo($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
+    <- plv8x.mk-user-func plx.conn, "text lsgo(text, plv8x.json)", ':-> plv8x_require "LiveScript" .compile ...'
+    err, res <- plx.conn.query "select lsgo($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect (eval ret)! .to.equal 42
     done!
   .. 'required object persistency', (done) ->
-    err, res <- conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx = 123')"""
+    err, res <- plx.conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx = 123')"""
     expect(err).to.be.a('null');
-    err, res <- conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx') as ret"""
+    err, res <- plx.conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx') as ret"""
     expect err .to.be.a('null');
     {ret} = res.rows.0
     expect ret .to.equal \123
