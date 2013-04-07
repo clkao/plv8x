@@ -51,8 +51,7 @@ describe 'db', -> ``it``
     console.log JSON.stringify rv
     JSON.stringify rv
     """, {+bare}]
-    result <- plx.eval JSON.parse compiled
-    ret = JSON.parse result
+    ret <- plx.eval compiled
     expect ret?field .to.equal "plv8x_version"
     expect ret?value .to.equal "0.0.1"
     done!
