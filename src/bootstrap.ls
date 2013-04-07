@@ -117,11 +117,7 @@ _mk_json_eval = (type=1) -> match type
   | (< 0)
     (data, code) -> eval "(function(){return #code})" .apply(data)
   | otherwise => (code) ->
-    code = match code
-    | /^\s*(@|~>)/ => plv8x.compile-livescript code
-    | /^function/  => "(#code)"
-    | otherwise    => "(function(){return #code})"
-    eval code .apply @
+    eval plv8x.xpression-to-body code .apply @
 
 _boot =
   """

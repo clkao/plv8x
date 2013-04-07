@@ -99,14 +99,16 @@ export function connect(db)
   new pg.Client db
     ..connect!
 
-export function xpression-to-body()
+export function xpression-to-body(code)
   cls = if typeof plv8 is \undefined
     compile-livescript
   else
     plv8x.compile-livescript
-  match it
-  | /^function/ => it
-  | otherwise   => cls it
+  match code
+  | /^(->)/      => cls code # XXX: coffee
+  | /^\s*(@|~>)/ => cls code
+  | /^function/  => "(#code)"
+  | otherwise    => "(function(){return #code})"
 
 export function compile-livescript(expression)
   ls = if typeof plv8 is \undefined
