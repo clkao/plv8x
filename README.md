@@ -22,7 +22,8 @@ If you have trouble installing plv8 on MacOSX, try the fork that includes unmerg
 
 # Install plv8x
 
-    % npm i -g plv8x
+    % git clone git://github.com/clkao/plv8x.git; cd plv8x
+    % npm i -g .
 
 # Quick start
 
