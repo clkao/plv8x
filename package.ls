@@ -28,6 +28,7 @@ dependencies:
   resolve: \0.2.x
   one: '1.8.2'
   LiveScript: \1.1.1
+  'coffee-script': \*
 devDependencies:
   mocha: \*
   chai: \*

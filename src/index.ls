@@ -100,25 +100,25 @@ export function connect(db)
     ..connect!
 
 export function xpression-to-body(code)
-  cls = if typeof plv8 is \undefined
-    compile-livescript
-  else
-    plv8x.compile-livescript
+  cls = if plv8? then plv8x.compile-livescript else compile-livescript
+  ccoffee = if plv8? then plv8x.compile-coffeescript else compile-coffeescript
   match code
-  | /^\s*->/     => cls code # XXX: => fo rcoffee
+  | /^\s*->/     => cls code
   | /^\s*~>/     => cls code.replace /~>/ \->
+  | /^\s*\=\>/   => ccoffee code.replace /\=\>/ \->
   | /^function/  => "(#code)"
   | /^\s*@/      => cls "-> #code"
   | /\breturn[(\s]/ => "(function(){#code})"
   | otherwise       => "(function(){return #code})"
 
 export function compile-livescript(expression)
-  ls = if typeof plv8 is \undefined
-    require \LiveScript
-  else
-    plv8x.require \LiveScript
-
+  ls = if plv8? then plv8x.require \LiveScript else require \LiveScript
   ls.compile expression, {+bare} .replace /;$/, ''
+
+export function compile-coffeescript(expression)
+  cs = if plv8? then plv8x.require \coffee-script else require \coffee-script
+  console.log cs.compile expression, {+bare} .replace /;$/, ''
+  cs.compile expression, {+bare} .replace /;$/, ''
 
 export function _mk_func (
   name, param-obj, ret, body, {lang = \plv8, skip-compile, cascade, boot} = {}
