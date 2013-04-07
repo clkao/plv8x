@@ -57,12 +57,12 @@ EXCEPTION WHEN OTHERS THEN END; $$;
     ..query _mk_func \plv8x.boot {} \void _boot
     ..query _mk_func \plv8x.eval {str: \text} \text _eval
     ..query _mk_func \plv8x.apply {str: \text, args: \plv8x.json} \plv8x.json _apply
-    ..query _mk_func \plv8x.json_eval {code: \text} \plv8x.json (code) ->
-      JSON.stringify eval("(function(){return #code})").apply(this)
-    ..query _mk_func \plv8x.json_eval {data: \plv8x.json, code: \text} \plv8x.json (data, code) ->
-      JSON.stringify eval("(function(){return #code})").apply(JSON.parse data)
-    ..query _mk_func \plv8x.json_eval {code: \text, data: \plv8x.json} \plv8x.json (code, data) ->
-      JSON.stringify eval("(function(){return #code})").apply(JSON.parse data)
+    ..query _mk_func \plv8x.json_eval {code: \text} \plv8x.json ((code) ->
+      eval("(function(){return #code})").apply(this)), {+cascade}
+    ..query _mk_func \plv8x.json_eval {data: \plv8x.json, code: \text} \plv8x.json ((data, code) ->
+      eval("(function(){return #code})").apply(data)), {+cascade}
+    ..query _mk_func \plv8x.json_eval {code: \text, data: \plv8x.json} \plv8x.json ((code, data) ->
+      eval("(function(){return #code})").apply(data)), {+cascade}
     ..query '''
 DROP OPERATOR IF EXISTS |> (NONE, text); CREATE OPERATOR |> (
     RIGHTARG = text,

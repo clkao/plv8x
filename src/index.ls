@@ -102,7 +102,7 @@ export function connect(db)
     ..connect!
 
 export function _mk_func (
-  name, param-obj, ret, body, lang = \plv8, skip-compile
+  name, param-obj, ret, body, {lang = \plv8, skip-compile, cascade} = {}
 )
   params = []
   args = for pname, type of param-obj
@@ -128,7 +128,7 @@ export function _mk_func (
 SET client_min_messages TO WARNING;
 DO \$PLV8X_EOF\$ BEGIN
 
-DROP FUNCTION IF EXISTS #{name} (#params);
+DROP FUNCTION IF EXISTS #{name} (#params) #{if cascade => 'CASCADE' else ''};
 EXCEPTION WHEN OTHERS THEN END; \$PLV8X_EOF\$;
 
 CREATE FUNCTION #name (#params) RETURNS #ret AS \$PLV8X__BODY__\$
