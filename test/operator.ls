@@ -16,8 +16,8 @@ describe 'db', -> ``it``
     expect JSON.parse rows.0.ret .to.equal(1)
     done!
   .. 'javascript |> return', (done) ->
-    rows <- plx.query "select |> 'return 42' as ret"
-    expect JSON.parse rows.0.ret .to.equal(42)
+    rows <- plx.query "select |> 'if (true) { return 21.5; }' as ret"
+    expect JSON.parse rows.0.ret .to.equal(21.5)
     done!
   .. 'javascript |> function', (done) ->
     rows <- plx.query "select |> 'function() { return 42; }' as ret"
