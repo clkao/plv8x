@@ -64,7 +64,7 @@ EXCEPTION WHEN OTHERS THEN END; $$;
     ..query _mk_func \plv8x.json_eval {code: \text, data: \plv8x.json} \plv8x.json (code, data) ->
       JSON.stringify eval("(function(){return #code})").apply(JSON.parse data)
     ..query '''
-DROP OPERATOR IF EXISTS |> (text); CREATE OPERATOR |> (
+DROP OPERATOR IF EXISTS |> (NONE, text); CREATE OPERATOR |> (
     RIGHTARG = text,
     PROCEDURE = plv8x.json_eval
 );
