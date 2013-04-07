@@ -105,10 +105,11 @@ export function xpression-to-body(code)
   else
     plv8x.compile-livescript
   match code
-  | /^(->)/      => cls code # XXX: coffee
+  | /^->/        => cls code # XXX: => for coffee
   | /^\s*(@|~>)/ => cls code
-  | /^function/  => "(#code)"
-  | otherwise    => "(function(){return #code})"
+  | /^\s*function/  => "(#code)"
+  | /\breturn[(\s]/ => "(function(){#code})"
+  | otherwise       => "(function(){return #code})"
 
 export function compile-livescript(expression)
   ls = if typeof plv8 is \undefined
