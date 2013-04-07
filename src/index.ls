@@ -109,7 +109,7 @@ export function compile-livescript(expression)
   else
     plv8x.require \LiveScript
 
-  "(function() { return #{ ls.compile expression, {+bare} } })()"
+  ls.compile expression, {+bare} .replace /;$/, ''
 
 export function _mk_func (
   name, param-obj, ret, body, {lang = \plv8, skip-compile, cascade, boot} = {}
