@@ -101,8 +101,15 @@ export function connect(db)
 
 export function xpression-to-body() => match it
   | /^function/ => it
-  | otherwise
-    (require \LiveScript .compile it, {+bare}) - /;$/
+  | otherwise   => compile-livescript it
+
+export function compile-livescript(expression)
+  ls = if typeof plv8 is \undefined
+    require \LiveScript
+  else
+    plv8x.require \LiveScript
+
+  "(function() { return #{ ls.compile expression, {+bare} } })()"
 
 export function _mk_func (
   name, param-obj, ret, body, {lang = \plv8, skip-compile, cascade, boot} = {}
@@ -116,11 +123,7 @@ export function _mk_func (
 
   if lang is \plls and not skip-compile
     lang = \plv8
-    [{ compiled }] = plv8.execute do
-      'SELECT plv8x.apply($1, $2) AS compiled'
-      'LiveScript.compile'
-      JSON.stringify [body, { +bare }]
-    compiled -= /;$/
+    compiled = compile-livescript body
 
   compiled ||= body
   body = "(eval(#compiled))(#args)";

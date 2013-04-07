@@ -1,4 +1,4 @@
-{_mk_func} = require \..
+{_mk_func, compile-livescript} = require \..
 {plv8x-sql} = require \./sql
 
 module.exports = (drop, cascade, done) ->
@@ -125,7 +125,8 @@ _boot =
     if (typeof plv8x == 'undefined')
       plv8x = {
         global: {},
-        require: #{_require.toString!replace /(['\\])/g, '\$1'}
+        require: #{_require.toString!replace /(['\\])/g, '\$1'},
+        compileLivescript: #{compile-livescript.toString!replace /(['\\])/g, '\$1'}
       };
       plv8x_require = plv8x.require
   }
