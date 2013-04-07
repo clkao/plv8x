@@ -55,7 +55,7 @@ EXCEPTION WHEN OTHERS THEN END; $$;
 '''
   @conn
     ..query _mk_func \plv8x.boot {} \void _boot
-    ..query _mk_func \plv8x.eval {str: \text} \text _eval
+    ..query _mk_func \plv8x.eval {str: \text} \plv8x.json _eval
     ..query _mk_func \plv8x.apply {str: \text, args: \plv8x.json} \plv8x.json _apply
     ..query _mk_func \plv8x.json_eval {code: \text} \plv8x.json ((code) ->
       eval("(function(){return #code})").apply(this)), {+cascade, +boot}

@@ -41,7 +41,7 @@ describe 'db', -> ``it``
     err, res <- conn.query "select plv8x.eval($1) as ret", ["plv8x_require('LiveScript').VERSION"]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
-    expect ret .to.equal \1.1.1
+    expect ret .to.equal \"1.1.1"
     done!
   .. 'lscompile', (done) ->
     conn.query plv8x._mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x.plv8x-lift "LiveScript", "compile"

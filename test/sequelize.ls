@@ -32,7 +32,7 @@ describe 'db', -> ``it``
     <- plx.eval helpers
     compiled <- plx.ap (-> plv8x.require("LiveScript").compile), ["""
     {STRING, TEXT, DATE, BOOLEAN, INTEGER}:Sequelize = plv8x_require "sequelize"
-    sql = new Sequelize null, null, null { dialect: "plv8", -xlogging }
+    sql = new Sequelize null, null, null { dialect: "plv8", -logging }
 
     SystemModel = do
         field: { type: STRING, +primaryKey }
@@ -48,8 +48,7 @@ describe 'db', -> ``it``
 
     pgprocess.next!
 
-    console.log JSON.stringify rv
-    JSON.stringify rv
+    rv
     """, {+bare}]
     ret <- plx.eval compiled
     expect ret?field .to.equal "plv8x_version"
@@ -66,3 +65,4 @@ function helpers()
         next: ->
             doit = (-> return unless deferred.length; deferred.shift!0!; doit!)
             doit!
+    null
