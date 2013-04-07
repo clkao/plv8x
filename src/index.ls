@@ -73,11 +73,8 @@ class PLX
     body = if pkg
       plv8x-lift pkg, expression
       boot = true
-    else if expression.match /^function/
-      expression
     else
-      (require \LiveScript .compile expression, {+bare}) - /;$/
-
+      xpression-to-body expression
     <~ @query _mk_func name, param-obj, rettype, body, {boot}
 
     cb { rettype, name, param-obj, body }
@@ -101,6 +98,11 @@ export function connect(db)
   require! pg
   new pg.Client db
     ..connect!
+
+export function xpression-to-body() => match it
+  | /^function/ => it
+  | otherwise
+    (require \LiveScript .compile it, {+bare}) - /;$/
 
 export function _mk_func (
   name, param-obj, ret, body, {lang = \plv8, skip-compile, cascade, boot} = {}
