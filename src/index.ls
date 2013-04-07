@@ -99,9 +99,14 @@ export function connect(db)
   new pg.Client db
     ..connect!
 
-export function xpression-to-body() => match it
+export function xpression-to-body()
+  cls = if typeof plv8 is \undefined
+    compile-livescript
+  else
+    plv8x.compile-livescript
+  match it
   | /^function/ => it
-  | otherwise   => compile-livescript it
+  | otherwise   => cls it
 
 export function compile-livescript(expression)
   ls = if typeof plv8 is \undefined

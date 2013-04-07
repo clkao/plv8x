@@ -1,4 +1,4 @@
-{_mk_func, compile-livescript} = require \..
+{_mk_func, compile-livescript, xpression-to-body} = require \..
 {plv8x-sql} = require \./sql
 
 module.exports = (drop, cascade, done) ->
@@ -123,8 +123,6 @@ _mk_json_eval = (type=1) -> match type
     | otherwise    => "(function(){return #code})"
     eval code .apply @
 
-console.log _mk_json_eval 0
-
 _boot =
   """
   function() {
@@ -132,6 +130,7 @@ _boot =
       plv8x = {
         global: {},
         require: #{_require.toString!replace /(['\\])/g, '\$1'},
+        xpressionToBody: #{xpression-to-body.toString!replace /(['\\])/g, '\$1'},
         compileLivescript: #{compile-livescript.toString!replace /(['\\])/g, '\$1'}
       };
       plv8x_require = plv8x.require
