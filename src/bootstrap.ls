@@ -1,4 +1,4 @@
-{_mk_func, compile-livescript, xpression-to-body} = require \..
+{_mk_func, compile-coffeescript, compile-livescript, xpression-to-body} = require \..
 {plv8x-sql} = require \./sql
 
 module.exports = (drop, cascade, done) ->
@@ -127,10 +127,11 @@ _boot =
   function() {
     if (typeof plv8x == 'undefined')
       plv8x = {
-        global: {},
         require: #{_require.toString!replace /(['\\])/g, '\$1'},
         xpressionToBody: #{xpression-to-body.toString!replace /(['\\])/g, '\$1'},
-        compileLivescript: #{compile-livescript.toString!replace /(['\\])/g, '\$1'}
+        compileCoffeescript: #{compile-coffeescript.toString!replace /(['\\])/g, '\$1'},
+        compileLivescript: #{compile-livescript.toString!replace /(['\\])/g, '\$1'},
+        global: {}
       };
       plv8x_require = plv8x.require
   }

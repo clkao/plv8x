@@ -116,8 +116,8 @@ export function compile-livescript(expression)
   ls.compile expression, {+bare} .replace /;$/, ''
 
 export function compile-coffeescript(expression)
-  cs = if plv8? then plv8x.require \coffee-script else require \coffee-script
-  console.log cs.compile expression, {+bare} .replace /;$/, ''
+  cs = if plv8? then plv8x.require \CoffeeScript else require \CoffeeScript
+  throw "CoffeeScript not found, use plv8x --import CoffeeScript:/path/to/extras/cofee-script.js to enable it" unless cs
   cs.compile expression, {+bare} .replace /;$/, ''
 
 export function _mk_func (
