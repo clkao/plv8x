@@ -18,7 +18,7 @@
   },
   "scripts": {
     "test": "ln -sf ../../../bundled_modules/util node_modules/sequelize/node_modules/ &&ln -sf ../../../bundled_modules/events node_modules/sequelize/node_modules/ &&env PATH=\"./node_modules/.bin:$PATH\" mocha",
-    "prepublish": "env PATH=\"./node_modules/.bin:$PATH\" lsc -cj package.ls &&\nlsc -bc bin &&\nlsc -bc -o lib src"
+    "preinstall": "env PATH=\"./node_modules/.bin:$PATH\" lsc -cj package.ls &&\nlsc -bc bin &&\nlsc -bc -o lib src"
   },
   "engines": {
     "node": "*"

@@ -16,7 +16,7 @@ scripts:
     ln -sf ../../../bundled_modules/util node_modules/sequelize/node_modules/ &&
     ln -sf ../../../bundled_modules/events node_modules/sequelize/node_modules/ &&
     env PATH="./node_modules/.bin:$PATH" mocha'
-  prepublish: """
+  preinstall: """
     env PATH="./node_modules/.bin:$PATH" lsc -cj package.ls &&
     lsc -bc bin &&
     lsc -bc -o lib src
