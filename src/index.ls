@@ -33,13 +33,22 @@ class PLX
     @query "delete from plv8x.code where name = $1" [name], -> cb it.rows
 
   _bundle: (name, manifest, cb) ->
-    require! one
+    require! <[one tmp path fs]>
     one.quiet true
     exclude = <[one pg]>
     # once we get cross-dist loading, avoid duplicated plv8x
     # if name is \plv8x => exclude.push that
-    err, bundle <~ one.build manifest, {-debug, exclude}
+    err, tmpfile <~ tmp.tmpName
+
+    manifest := path.relative process.cwd!, manifest
+    err <- one manifest
+      .exclude ...exclude
+      .name name
+      .debug true
+      .save tmpfile
+
     throw err if err
+    bundle = fs.readFileSync tmpfile, \utf-8
 
     # XXX
     delete global.key
