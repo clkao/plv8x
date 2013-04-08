@@ -3,8 +3,8 @@ author:
   name: ['Chia-liang Kao']
   email: 'clkao@clkao.org'
 name: 'plv8x'
-description: 'Deploy Node.js module bundles into PostgreSQL plv8'
-version: '0.0.1'
+description: 'Use JavaScript expressions and modules in PostgreSQL plv8'
+version: '0.3.1'
 main: \lib/index.js
 bin:
   plv8x: 'bin/cmd.js'
@@ -16,7 +16,7 @@ scripts:
     ln -sf ../../../bundled_modules/util node_modules/sequelize/node_modules/ &&
     ln -sf ../../../bundled_modules/events node_modules/sequelize/node_modules/ &&
     env PATH="./node_modules/.bin:$PATH" mocha'
-  preinstall: """
+  prepublish: """
     env PATH="./node_modules/.bin:$PATH" lsc -cj package.ls &&
     lsc -bc bin &&
     lsc -bc -o lib src
