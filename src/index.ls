@@ -34,24 +34,25 @@ class PLX
 
   _bundle: (name, manifest, cb) ->
     require! <[one tmp path fs]>
-    one.quiet true
     exclude = <[one pg]>
     # once we get cross-dist loading, avoid duplicated plv8x
     # if name is \plv8x => exclude.push that
     err, tmpfile <~ tmp.tmpName
 
-    manifest := path.relative process.cwd!, manifest
-    err <- one manifest
+    # XXX one 2.0.8 bug: absolute manifest doesn't work
+    o = one path.relative process.cwd!, manifest
       .exclude ...exclude
       .name name
-      .debug true
-      .save tmpfile
+      .quiet!
+
+    # XXX some way of injecting node core modules later
+    if name is \sequelize
+      o.dependency \util \* .dependency \events \*
+    err <- o.save tmpfile
 
     throw err if err
     bundle = fs.readFileSync tmpfile, \utf-8
 
-    # XXX
-    delete global.key
     cb bundle
 
   import-bundle: (name, manifest, cb) ->
