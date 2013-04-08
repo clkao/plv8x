@@ -34,9 +34,7 @@ class PLX
 
   _bundle: (name, manifest, cb) ->
     require! <[one tmp path fs]>
-    exclude = <[one pg]>
-    # once we get cross-dist loading, avoid duplicated plv8x
-    # if name is \plv8x => exclude.push that
+    exclude = <[one pg plv8x]>
     err, tmpfile <~ tmp.tmpName
 
     # XXX one 2.0.8 bug: absolute manifest doesn't work

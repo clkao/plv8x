@@ -88,10 +88,11 @@ _apply = (func, args) ->
   eval func .apply null args
 
 _require = (name) ->
+  plv8.elog DEBUG, \require name, JSON.stringify {plv8x.require-stack, plv8x.global}
   return plv8x.global[name] if plv8x.global[name]?
 
-  exclude = if plv8x.requireStack.length
-    "where name not in (#{plv8x.requireStack.map -> "'#it'" .join \,})"
+  exclude = if plv8x.require-stack.length
+    """where name not in (#{plv8x.require-stack.map(-> "'#it'").join \,})"""
   else
     ""
 
@@ -99,12 +100,18 @@ _require = (name) ->
   x = {}
   err = ''
   for {code,name:bundle} in res
-    plv8x.requireStack.push bundle
+    plv8x.require-stack.push bundle
     try
       loader = """
 (function() {
     var module = {exports: {}};
     var context = {};
+    var require = function(name) {
+      if (name === '#name') {
+        throw new Error('Cannot find module "#name"');
+      }
+      return plv8x.require(name);
+    };
     (function() { #code }).apply(context);
     if (module.exports.require)
       return module.exports.require('#name');
@@ -112,14 +119,14 @@ _require = (name) ->
       return context['#name'];
 })()
 """
-      module = eval loader
-      plv8x.requireStack.pop!
-      return plv8x.global[name] = module if module?
+      if eval loader
+        plv8x.require-stack.pop!
+        return plv8x.global[name] = that
     catch e
       err := e
       if e isnt /Cannot find module/
         break
-    plv8x.requireStack.pop!
+    plv8x.require-stack.pop!
   plv8.elog WARNING, "failed to load module #name: #err"
 
 _mk_json_eval = (type=1) -> match type
@@ -142,7 +149,7 @@ _boot =
         requireStack: [],
         global: {}
       };
-      plv8x_require = plv8x.require
+      plv8x_require = plv8x.require;
   }
   """
 
