@@ -149,7 +149,7 @@ _boot =
         requireStack: [],
         global: {}
       };
-      plv8x_require = plv8x.require;
+      plv8x_require = require = plv8x.require;
   }
   """
 

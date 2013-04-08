@@ -120,11 +120,10 @@ export function xpression-to-body(code)
   | otherwise       => "(function(){return #code})"
 
 export function compile-livescript(expression)
-  ls = if plv8? then plv8x.require \LiveScript else require \LiveScript
-  ls.compile expression, {+bare} .replace /;$/, ''
+  require \LiveScript .compile expression, {+bare} .replace /;$/, ''
 
 export function compile-coffeescript(expression)
-  cs = if plv8? then plv8x.require \CoffeeScript else require \CoffeeScript
+  cs = require \CoffeeScript
   throw "CoffeeScript not found, use plv8x --import CoffeeScript:/path/to/extras/cofee-script.js to enable it" unless cs
   cs.compile expression, {+bare} .replace /;$/, ''
 
