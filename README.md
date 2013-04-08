@@ -1,7 +1,7 @@
 plv8x
 ======
 
-[![Build Status](https://travis-ci.org/clkao/plv8x?branch=master)](https://travis-ci.org/clkao/plv8x)
+[![Build Status](https://travis-ci.org/clkao/plv8x.png?branch=master)](https://travis-ci.org/clkao/plv8x)
 
 plv8x helps you manage functions and packages in plv8, postgresql's javascript
 procedural language support.
