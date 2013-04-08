@@ -98,17 +98,20 @@ _require = (name) ->
       loader = """
 (function() {
     var module = {exports: {}};
-    #code;
-    return module.exports.require;
+    var context = {};
+    (function() { #code }).apply(context);
+    if (module.exports.require)
+      return module.exports.require('#name');
+    else
+      return context['#name'];
 })()
 """
-      req = eval loader
-      module = req name
+      module = eval loader
       return plv8x.global[name] = module if module?
     catch e
+      err := e
       if e isnt /Cannot find module/
         break
-      err := e
   plv8.elog WARNING, "failed to load module #name: #err"
 
 _mk_json_eval = (type=1) -> match type
