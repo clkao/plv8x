@@ -90,10 +90,16 @@ _apply = (func, args) ->
 _require = (name) ->
   return plv8x.global[name] if plv8x.global[name]?
 
-  res = plv8.execute "select name, code from plv8x.code", []
+  exclude = if plv8x.requireStack.length
+    "where name not in (#{plv8x.requireStack.map -> "'#it'" .join \,})"
+  else
+    ""
+
+  res = plv8.execute "select name, code from plv8x.code #exclude", []
   x = {}
   err = ''
   for {code,name:bundle} in res
+    plv8x.requireStack.push bundle
     try
       loader = """
 (function() {
@@ -107,11 +113,13 @@ _require = (name) ->
 })()
 """
       module = eval loader
+      plv8x.requireStack.pop!
       return plv8x.global[name] = module if module?
     catch e
       err := e
       if e isnt /Cannot find module/
         break
+    plv8x.requireStack.pop!
   plv8.elog WARNING, "failed to load module #name: #err"
 
 _mk_json_eval = (type=1) -> match type
@@ -131,6 +139,7 @@ _boot =
         xpressionToBody: #{xpression-to-body.toString!replace /(['\\])/g, '\$1'},
         compileCoffeescript: #{compile-coffeescript.toString!replace /(['\\])/g, '\$1'},
         compileLivescript: #{compile-livescript.toString!replace /(['\\])/g, '\$1'},
+        requireStack: [],
         global: {}
       };
       plv8x_require = plv8x.require
