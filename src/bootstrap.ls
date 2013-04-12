@@ -60,6 +60,9 @@ EXCEPTION WHEN OTHERS THEN END; $$;
     ..query _mk_func \plv8x.json_eval {code: \text} \plv8x.json _mk_json_eval(0), {+cascade, +boot}
     ..query _mk_func \plv8x.json_eval {data: \plv8x.json, code: \text} \plv8x.json _mk_json_eval(-1), {+cascade, +boot}
     ..query _mk_func \plv8x.json_eval {code: \text, data: \plv8x.json} \plv8x.json _mk_json_eval(1), {+cascade, +boot}
+    ..query _mk_func \plv8x.json_eval_ls {code: \text} \plv8x.json _mk_json_eval_ls(0), {+cascade, +boot}
+    ..query _mk_func \plv8x.json_eval_ls {data: \plv8x.json, code: \text} \plv8x.json _mk_json_eval_ls(-1), {+cascade, +boot}
+    ..query _mk_func \plv8x.json_eval_ls {code: \text, data: \plv8x.json} \plv8x.json _mk_json_eval_ls(1), {+cascade, +boot}
     ..query '''
 DROP OPERATOR IF EXISTS |> (NONE, text); CREATE OPERATOR |> (
     RIGHTARG = text,
@@ -76,6 +79,23 @@ DROP OPERATOR IF EXISTS <| (text, plv8x.json); CREATE OPERATOR <| (
     RIGHTARG = plv8x.json,
     COMMUTATOR = |>,
     PROCEDURE = plv8x.json_eval
+);
+
+DROP OPERATOR IF EXISTS ~> (NONE, text); CREATE OPERATOR ~> (
+    RIGHTARG = text,
+    PROCEDURE = plv8x.json_eval_ls
+);
+DROP OPERATOR IF EXISTS ~> (plv8x.json, text); CREATE OPERATOR ~> (
+    LEFTARG = plv8x.json,
+    RIGHTARG = text,
+    COMMUTATOR = <~,
+    PROCEDURE = plv8x.json_eval_ls
+);
+DROP OPERATOR IF EXISTS <~ (text, plv8x.json); CREATE OPERATOR <~ (
+    LEFTARG = text,
+    RIGHTARG = plv8x.json,
+    COMMUTATOR = ~>,
+    PROCEDURE = plv8x.json_eval_ls
 );
 '''
     r = ..query "select plv8x.boot()"
@@ -136,6 +156,14 @@ _mk_json_eval = (type=1) -> match type
     eval plv8x.xpression-to-body code .apply data
   | otherwise => (code) ->
     eval plv8x.xpression-to-body code .apply @
+
+_mk_json_eval_ls = (type=1) -> match type
+  | (> 0) => (code, data) ->
+    eval plv8x.xpression-to-body "~>#code" .apply data
+  | (< 0) => (data, code) ->
+    eval plv8x.xpression-to-body "~>#code" .apply data
+  | otherwise => (code) ->
+    eval plv8x.xpression-to-body "~>#code" .apply @
 
 _boot =
   """
