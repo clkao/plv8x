@@ -30,7 +30,7 @@ If you have trouble installing plv8 on MacOSX, try the fork that includes unmerg
 Enable plv8x for your database:
 
     % createdb test
-    % plv8x --db tcp://localhost/test -l
+    % plv8x -d test -l
     plv8x: 491425 bytes
 
 Now create some test data with json columns: (example table from [Postgres 9.3 feature highlight: JSON operators](http://michael.otacoo.com/postgresql-2/postgres-9-3-feature-highlight-json-operators/))
@@ -120,7 +120,7 @@ CoffeeScript:
 
 Let's try reusing some existing npm modules:
 
-    % plv8x --db tcp://localhost/test --import qs:./node_modules/qs/package.json 
+    % plv8x -d test --import qs:./node_modules/qs/package.json 
     % psql test
 
     # parse a query string
@@ -136,7 +136,7 @@ Let's try reusing some existing npm modules:
      "bar"
 
     # create a user function from qs so we don't have to require it:
-    % plv8x --db tcp://localhost/test --inject 'plv8x.json parse_qs(text)=qs:parse'
+    % plv8x -d test --inject 'plv8x.json parse_qs(text)=qs:parse'
     ok plv8x.json parse_qs(text)
     # Now parse_qs is a postgresql function:
     test=# select parse_qs('foo=bar&baz=1') as qs;
