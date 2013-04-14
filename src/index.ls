@@ -95,7 +95,7 @@ class PLX
       plx[key] ...rest
 
 exports.new = (db, cb) ->
-  db = "tcp://localhost/#db" if db.indexOf '/' < 0
+  db = "tcp://localhost/#db" if db.indexOf('/') < 0
   conn = connect db
   plx = new PLX conn
   <- plx.bootstrap
