@@ -79,8 +79,8 @@ class PLX
     [_, pkg, expression] = source.match /^(\w*):(.*)$/ or throw "failed to parse source #source"
 
     body = if pkg
-      plv8x-lift pkg, expression
       boot = true
+      plv8x-lift pkg, expression
     else
       xpression-to-body expression
     <~ @query _mk_func name, param-obj, rettype, body, {boot}
