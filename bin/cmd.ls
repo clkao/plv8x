@@ -4,6 +4,7 @@ plv8x = require \../
 
 argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 .option 'db' do
+  alias: 'd'
   desc: 'database connection string'
 .option 'json' do
   alias: 'j'
