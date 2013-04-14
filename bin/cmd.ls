@@ -59,9 +59,9 @@ switch
     done!
 | argv.list =>
   plx.list (res) ->
-    for {name, length} in res
-      console.log "#name: #{length} bytes"
-    done!
+    unless argv.json
+      res = ["#name: #{length} bytes" for {name, length} in res].join '\n'
+    done res
 | argv.eval =>
   code = plv8x.xpression-to-body argv.eval
   plx.eval "(#code)()", done
