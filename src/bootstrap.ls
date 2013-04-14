@@ -1,5 +1,5 @@
 {_mk_func, compile-coffeescript, compile-livescript, xpression-to-body} = require \..
-{plv8x-sql} = require \./sql
+{plv8x-sql,operators-sql} = require \./sql
 
 module.exports = (drop, cascade, done) ->
   if typeof drop is \function
@@ -63,41 +63,7 @@ EXCEPTION WHEN OTHERS THEN END; $$;
     ..query _mk_func \plv8x.json_eval_ls {code: \text} \plv8x.json _mk_json_eval_ls(0), {+cascade, +boot}
     ..query _mk_func \plv8x.json_eval_ls {data: \plv8x.json, code: \text} \plv8x.json _mk_json_eval_ls(-1), {+cascade, +boot}
     ..query _mk_func \plv8x.json_eval_ls {code: \text, data: \plv8x.json} \plv8x.json _mk_json_eval_ls(1), {+cascade, +boot}
-    ..query '''
-DROP OPERATOR IF EXISTS |> (NONE, text); CREATE OPERATOR |> (
-    RIGHTARG = text,
-    PROCEDURE = plv8x.json_eval
-);
-DROP OPERATOR IF EXISTS |> (plv8x.json, text); CREATE OPERATOR |> (
-    LEFTARG = plv8x.json,
-    RIGHTARG = text,
-    COMMUTATOR = <|,
-    PROCEDURE = plv8x.json_eval
-);
-DROP OPERATOR IF EXISTS <| (text, plv8x.json); CREATE OPERATOR <| (
-    LEFTARG = text,
-    RIGHTARG = plv8x.json,
-    COMMUTATOR = |>,
-    PROCEDURE = plv8x.json_eval
-);
-
-DROP OPERATOR IF EXISTS ~> (NONE, text); CREATE OPERATOR ~> (
-    RIGHTARG = text,
-    PROCEDURE = plv8x.json_eval_ls
-);
-DROP OPERATOR IF EXISTS ~> (plv8x.json, text); CREATE OPERATOR ~> (
-    LEFTARG = plv8x.json,
-    RIGHTARG = text,
-    COMMUTATOR = <~,
-    PROCEDURE = plv8x.json_eval_ls
-);
-DROP OPERATOR IF EXISTS <~ (text, plv8x.json); CREATE OPERATOR <~ (
-    LEFTARG = text,
-    RIGHTARG = plv8x.json,
-    COMMUTATOR = ~>,
-    PROCEDURE = plv8x.json_eval_ls
-);
-'''
+    ..query operators-sql!
     r = ..query "select plv8x.boot()"
     r.on \end done
 
