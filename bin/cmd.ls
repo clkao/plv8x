@@ -19,6 +19,9 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
   desc: 'Delete bundles'
 .option 'inject' do
   desc: 'Inject plv8 function from bundles or string'
+.option 'query' do
+  alias: 'c'
+  desc: 'Execute query'
 .option 'eval' do
   alias: 'e'
   desc: 'Eval the given expression in plv8x context'
@@ -62,6 +65,8 @@ switch
     unless argv.json
       res = ["#name: #{length} bytes" for {name, length} in res].join '\n'
     done res
+| argv.query =>
+  plx.query argv.query, done
 | argv.eval =>
   code = plv8x.xpression-to-body argv.eval
   plx.eval "(#code)()", done
