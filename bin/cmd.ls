@@ -5,6 +5,9 @@ plv8x = require \../
 argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 .option 'db' do
   desc: 'database connection string'
+.option 'json' do
+  alias: 'j'
+  desc: 'Use json for output'
 .option 'list' do
   alias: 'l'
   desc: 'List bundles'
@@ -16,6 +19,12 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
   desc: 'Delete bundles'
 .option 'inject' do
   desc: 'Inject plv8 function from bundles or string'
+.option 'eval' do
+  alias: 'e'
+  desc: 'Eval the given expression in plv8x context'
+.option 'require' do
+  alias: 'r'
+  desc: 'Require the given file and eval in plv8x context'
 .option 'help' do
   alias: 'h'
   desc: 'Show this message'
@@ -26,7 +35,11 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 
 plx <- plv8x.new argv.db
 
-done = -> plx.end!
+done = (output) ->
+  if output
+    output = JSON.stringify output if argv.json
+    console.log output
+  plx.end!
 
 switch
 | argv.import =>
@@ -49,4 +62,11 @@ switch
     for {name, length} in res
       console.log "#name: #{length} bytes"
     done!
+| argv.eval =>
+  code = plv8x.xpression-to-body argv.eval
+  plx.eval "(#code)()", done
+| argv.require =>
+  code = fs.readFileSync argv.require, \utf8
+  code = plv8x.compile-livescript code if argv.require is /\.ls$/
+  plx.eval code, done
 | otherwise => console.log "Unknown command: #{argv._.0}"; done!
