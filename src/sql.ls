@@ -35,3 +35,39 @@ CREATE TABLE IF NOT EXISTS plv8x.code (
 );
   """
 
+export function operators-sql()
+  '''
+DROP OPERATOR IF EXISTS |> (NONE, text); CREATE OPERATOR |> (
+    RIGHTARG = text,
+    PROCEDURE = plv8x.json_eval
+);
+DROP OPERATOR IF EXISTS |> (plv8x.json, text); CREATE OPERATOR |> (
+    LEFTARG = plv8x.json,
+    RIGHTARG = text,
+    COMMUTATOR = <|,
+    PROCEDURE = plv8x.json_eval
+);
+DROP OPERATOR IF EXISTS <| (text, plv8x.json); CREATE OPERATOR <| (
+    LEFTARG = text,
+    RIGHTARG = plv8x.json,
+    COMMUTATOR = |>,
+    PROCEDURE = plv8x.json_eval
+);
+
+DROP OPERATOR IF EXISTS ~> (NONE, text); CREATE OPERATOR ~> (
+    RIGHTARG = text,
+    PROCEDURE = plv8x.json_eval_ls
+);
+DROP OPERATOR IF EXISTS ~> (plv8x.json, text); CREATE OPERATOR ~> (
+    LEFTARG = plv8x.json,
+    RIGHTARG = text,
+    COMMUTATOR = <~,
+    PROCEDURE = plv8x.json_eval_ls
+);
+DROP OPERATOR IF EXISTS <~ (text, plv8x.json); CREATE OPERATOR <~ (
+    LEFTARG = text,
+    RIGHTARG = plv8x.json,
+    COMMUTATOR = ~>,
+    PROCEDURE = plv8x.json_eval_ls
+);
+  '''
