@@ -6,9 +6,6 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 .option 'db' do
   alias: 'd'
   desc: 'database connection string'
-.option 'json' do
-  alias: 'j'
-  desc: 'Use json for output'
 .option 'list' do
   alias: 'l'
   desc: 'List bundles'
@@ -29,6 +26,12 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 .option 'require' do
   alias: 'r'
   desc: 'Require the given file and eval in plv8x context'
+.option 'json' do
+  alias: 'j'
+  desc: 'Use JSON for output'
+.option 'yaml' do
+  alias: 'y'
+  desc: 'Use YAML for output (requires libyaml module)'
 .option 'help' do
   alias: 'h'
   desc: 'Show this message'
@@ -41,7 +44,11 @@ plx <- plv8x.new argv.db
 
 done = (output) ->
   if output
-    output = JSON.stringify output if argv.json
+    if argv.json
+      output = JSON.stringify output
+    else if argv.yaml
+      YAML = require \js-yaml
+      output = YAML.dump output
     console.log output
   plx.end!
 

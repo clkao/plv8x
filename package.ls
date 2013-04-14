@@ -30,7 +30,8 @@ dependencies:
   one: '>= 2.0.10'
   tmp: '0.0.x'
   LiveScript: \1.1.1
-  'coffee-script': \*
+#  'coffee-script': \*
+  'js-yaml': \*
 devDependencies:
   mocha: \*
   chai: \*
