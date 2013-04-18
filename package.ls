@@ -27,7 +27,7 @@ dependencies:
   optimist: \0.3.x
   pg: \1.0.x
   resolve: \0.3.x
-  one: '>= 2.0.10'
+  one: \2.5.x
   tmp: '0.0.x'
   LiveScript: \1.1.1
 #  'coffee-script': \*

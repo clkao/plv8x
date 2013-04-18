@@ -41,7 +41,6 @@ class PLX
     o = one path.relative process.cwd!, manifest
       .exclude ...exclude
       .name name
-      .quiet!
 
     # XXX some way of injecting node core modules later
     if name is \sequelize
