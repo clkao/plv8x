@@ -12,17 +12,22 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 .option 'purge' do
   desc: 'Purge bundles'
 .option 'import' do
+  alias: 'i'
   desc: 'Import bundles'
 .option 'delete' do
   desc: 'Delete bundles'
 .option 'inject' do
-  desc: 'Inject plv8 function from bundles or string'
+  alias: <[ fn f ]>
+  desc: 'Define plv8 function from bundles or string'
 .option 'query' do
   alias: 'c'
   desc: 'Execute query'
 .option 'eval' do
   alias: 'e'
   desc: 'Eval the given expression in plv8x context'
+.option 'eval-ls' do
+  alias: 'E'
+  desc: 'Eval the given LiveScript expression in plv8x context'
 .option 'require' do
   alias: 'r'
   desc: 'Require the given file and eval in plv8x context'
@@ -40,7 +45,8 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
   if process.argv.length <= 2 then throw 'Specify a parameter.'
 .argv
 
-plx <- plv8x.new argv.db
+conString = argv.db or process.env['PLV8XDB'] or process.env.TESTDBNAME
+plx <- plv8x.new conString
 
 done = (output) ->
   if output
@@ -54,11 +60,10 @@ done = (output) ->
 
 switch
 | argv.import =>
-  plx.import-bundle ...argv.import.split(\:), ->
-    done!
+  [name, manifest=require.resolve("#name/package.json")] = argv.import.split \:
+  plx.import-bundle name, manifest, -> done!
 | argv.delete =>
-  plx.delete-bundle argv.delete, ->
-    done!
+  plx.delete-bundle argv.delete, -> done!
 | argv.inject =>
   [spec, source] = argv.inject.split \=
   plx.mk-user-func spec, source, ->
@@ -77,6 +82,9 @@ switch
   plx.query argv.query, done
 | argv.eval =>
   code = plv8x.xpression-to-body argv.eval
+  plx.eval "(#code)()", done
+| argv.'eval-ls' =>
+  code = plv8x.xpression-to-body "~>#{ argv.'eval-ls' }"
   plx.eval "(#code)()", done
 | argv.require =>
   code = fs.readFileSync argv.require, \utf8

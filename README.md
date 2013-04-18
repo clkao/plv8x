@@ -136,7 +136,7 @@ Let's try reusing some existing npm modules:
      "bar"
 
     # create a user function from qs so we don't have to require it:
-    % plv8x -d test --inject 'plv8x.json parse_qs(text)=qs:parse'
+    % plv8x -d test --fn 'plv8x.json parse_qs(text)=qs:parse'
     ok plv8x.json parse_qs(text)
     # Now parse_qs is a postgresql function:
     test=# select parse_qs('foo=bar&baz=1') as qs;
