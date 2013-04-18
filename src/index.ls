@@ -45,11 +45,8 @@ class PLX
     # XXX some way of injecting node core modules later
     if name is \sequelize
       o.dependency \util \* .dependency \events \*
-    err <- o.save tmpfile
-
+    err, bundle <- o.save
     throw err if err
-    bundle = fs.readFileSync tmpfile, \utf-8
-
     cb bundle
 
   import-bundle: (name, manifest, cb) ->
