@@ -117,6 +117,7 @@ export function xpression-to-body(code)
   | /^\s*\=\>/   => ccoffee code.replace /\=\>/ \->
   | /^function/  => "(#code)"
   | /^\s*@/      => cls "-> #code"
+  | /^\s*&/      => cls "-> #code"
   | /\breturn[(\s]/ => "(function(){#code})"
   | otherwise       => "(function(){return #code})"
 
