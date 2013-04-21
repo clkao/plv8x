@@ -46,6 +46,9 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
 .argv
 
 conString = argv.db or process.env['PLV8XCONN'] or process.env['PLV8XDB'] or process.env.TESTDBNAME
+unless conString
+  console.log "ERROR: Please set the PLV8XDB environment variable, or pass in a connection string to -d"
+  process.exit!
 plx <- plv8x.new conString
 
 done = (output) ->
