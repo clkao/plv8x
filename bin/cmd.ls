@@ -45,7 +45,7 @@ argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
   if process.argv.length <= 2 then throw 'Specify a parameter.'
 .argv
 
-conString = argv.db or process.env['PLV8XDB'] or process.env.TESTDBNAME
+conString = argv.db or process.env['PLV8XCONN'] or process.env['PLV8XDB'] or process.env.TESTDBNAME
 plx <- plv8x.new conString
 
 done = (output) ->
