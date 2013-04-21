@@ -34,7 +34,12 @@ class PLX
 
   _bundle: (name, manifest, cb) ->
     require! <[one tmp path fs]>
-    exclude = <[one pg plv8x]>
+    exclude = <[one pg plv8x ]>
+
+    if name is \pgrest
+      # XXX temporary solution till we get proper manifest exclusion going
+      exclude ++= <[express cors gzippo connect-csv]>
+
     err, tmpfile <~ tmp.tmpName
 
     # XXX one 2.0.8 bug: absolute manifest doesn't work
