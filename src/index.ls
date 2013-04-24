@@ -42,10 +42,12 @@ class PLX
 
     err, tmpfile <~ tmp.tmpName
 
+    function replacer re, to then -> it.replace re, to
+    camelize = replacer /-[a-z]/ig -> it.char-at 1 .to-upper-case!
     # XXX one 2.0.8 bug: absolute manifest doesn't work
     o = one path.relative process.cwd!, manifest
       .exclude ...exclude
-      .name name
+      .name camelize name
 
     # XXX some way of injecting node core modules later
     if name is \sequelize
