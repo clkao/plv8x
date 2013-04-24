@@ -52,7 +52,7 @@ describe 'db', -> ``it``
     expect (eval ret)! .to.equal 42
     done!
   .. 'mk-user-func', (done) ->
-    <- plv8x.mk-user-func plx.conn, "text lsgo(text, plv8x.json)", ':-> plv8x_require "LiveScript" .compile ...'
+    <- plx.mk-user-func "text lsgo(text, plv8x.json)", ':-> plv8x_require "LiveScript" .compile ...'
     err, res <- plx.conn.query "select lsgo($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
