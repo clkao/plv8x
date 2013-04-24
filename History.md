@@ -1,3 +1,8 @@
+0.4.2 / 2013-04-24
+==================
+  * Support injecting functions with callback callconv
+  * Support injecting functions exported as root object
+
 0.4.1 / 2013-04-24
 ==================
   * Fix importing module-name-with-dash (@selenamarie)

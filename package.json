@@ -7,7 +7,7 @@
   },
   "name": "plv8x",
   "description": "Use JavaScript expressions and modules in PostgreSQL plv8",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "keywords": [
     "postgres",
     "pg",
