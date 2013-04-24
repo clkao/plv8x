@@ -146,9 +146,11 @@ Let's try reusing some existing npm modules:
 
 # Calling conventions for user functions
 
-We support both synchronous and async functions (via callback in the last
-argument that takes one parameter), as well as bare funtcions defined in
+We support both synchronous and async functions, as well as bare functions defined in
 `module.exports`.
+
+By default, the first two arguments to an async (back-call) function is taken
+to be `error` and `result` respectively:
 
     % plv8x -d test --fn 'text fn(text)=pkg:'           # out = pkg(x)
     % plv8x -d test --fn 'text fn(text)=pkg:method'     # out = pkg.method(in)
