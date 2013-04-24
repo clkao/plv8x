@@ -168,10 +168,22 @@ return #body;
   """
 
 export function plv8x-lift(module, func-name)
-  fcall = match func-name
-  | '' => ""
-  | /^[\s,_]*<-/ => throw 'not yet'
-  | otherwise => ".#{func-name}"
+  if [_, capture, method]? = func-name.match /^([\s,_]*)<-([-\w]+)?$/
+    capture ||= "err, _"
+    backcall = true
+  else
+    method = func-name
 
-  console.log \fcall fcall
-  compile-livescript "-> plv8x.require '#{module}' #fcall ..."
+  fcall = if method => ".#method" else ''
+  if backcall
+    compile-livescript """
+    ->
+      var $$rv
+      f = (plv8x.require '#{module}') #{fcall}
+      args = [].slice.call(arguments).concat (#{capture}) ->
+        $$rv := _
+      f ...args
+      $$rv
+    """
+  else
+    compile-livescript "-> plv8x.require '#{module}' #fcall ..."

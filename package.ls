@@ -36,4 +36,5 @@ devDependencies:
   mocha: \*
   chai: \*
   sequelize: 'git://github.com/clkao/sequelize.git'
+  uax11: \0.0.2
 optionalDependencies: {}
