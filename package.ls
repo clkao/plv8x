@@ -4,7 +4,7 @@ author:
   email: 'clkao@clkao.org'
 name: 'plv8x'
 description: 'Use JavaScript expressions and modules in PostgreSQL plv8'
-version: '0.4.0'
+version: '0.4.1'
 keywords: <[postgres pg database plv8]>
 main: \lib/index.js
 bin:

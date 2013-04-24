@@ -1,3 +1,11 @@
+0.4.1 / 2013-04-24
+==================
+  * Fix importing module-name-with-dash (@selenamarie)
+
+0.4.0 / 2013-04-21
+==================
+  * More helpful error message when --db is missing
+
 0.3.4 / 2013-04-14
 ==================
 
