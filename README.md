@@ -33,6 +33,11 @@ Enable plv8x for your database:
     % plv8x -d test -l
     plv8x: 491425 bytes
 
+We support synonymous `PLV8XDB` and `PLV8XCONN` environment variables,
+so there's no need to type `-d` over and over again on the command line:
+
+    % export PLV8XDB=test
+
 Now create some test data with json columns: (example table from [Postgres 9.3 feature highlight: JSON operators](http://michael.otacoo.com/postgresql-2/postgres-9-3-feature-highlight-json-operators/))
 
     % psql test
@@ -120,7 +125,8 @@ CoffeeScript:
 
 Let's try reusing some existing npm modules:
 
-    % plv8x -d test --import qs:./node_modules/qs/package.json 
+    % npm i -g qs
+    % plv8x -i qs # same as: plv8x -i qs:/path/to/qs/package.json
     % psql test
 
     # parse a query string
@@ -136,7 +142,7 @@ Let's try reusing some existing npm modules:
      "bar"
 
     # create a user function from qs so we don't have to require it:
-    % plv8x -d test --fn 'plv8x.json parse_qs(text)=qs:parse'
+    % plv8x -f 'plv8x.json parse_qs(text)=qs:parse'
     ok plv8x.json parse_qs(text)
     # Now parse_qs is a postgresql function:
     test=# select parse_qs('foo=bar&baz=1') as qs;
@@ -152,18 +158,18 @@ We support both synchronous and async functions, as well as bare functions defin
 By default, the first two arguments to an async (back-call) function is taken
 to be `error` and `result` respectively:
 
-    % plv8x -d test --fn 'text fn(text)=pkg:'           # out = pkg(x)
-    % plv8x -d test --fn 'text fn(text)=pkg:method'     # out = pkg.method(in)
-    % plv8x -d test --fn 'text fn(text)=pkg:<-'         # pkg(x, cb(err, out))
-    % plv8x -d test --fn 'text fn(text)=pkg:<-method'   # pkg.method(x, cb(err, out))
+    % plv8x -f 'text fn(text)=pkg:'           # out = pkg(x)
+    % plv8x -f 'text fn(text)=pkg:method'     # out = pkg.method(in)
+    % plv8x -f 'text fn(text)=pkg:<-'         # pkg(x, cb(err, out))
+    % plv8x -f 'text fn(text)=pkg:<-method'   # pkg.method(x, cb(err, out))
 
 Using an underscore, one can specify exactly which async callback parameter
 to expect from the lifted function:
 
-    % plv8x -d test --fn 'text fn(text)=pkg:<-'         # pkg(x, cb(err, out))
-    % plv8x -d test --fn 'text fn(text)=pkg:_<-'        # pkg(x, cb(out))
-    % plv8x -d test --fn 'text fn(text)=pkg:,_<-'       # pkg(x, cb(_0, out))
-    % plv8x -d test --fn 'text fn(text)=pkg:,,_<-'      # pkg(x, cb(_0, _1, out))
+    % plv8x -f 'text fn(text)=pkg:<-'         # pkg(x, cb(err, out))
+    % plv8x -f 'text fn(text)=pkg:_<-'        # pkg(x, cb(out))
+    % plv8x -f 'text fn(text)=pkg:,_<-'       # pkg(x, cb(_0, out))
+    % plv8x -f 'text fn(text)=pkg:,,_<-'      # pkg(x, cb(_0, _1, out))
 
 # License
 
