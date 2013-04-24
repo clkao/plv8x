@@ -168,8 +168,10 @@ return #body;
   """
 
 export function plv8x-lift(module, func-name)
-  """
-  function() {
-    return plv8x.require('#{module}').#{func-name}.apply(null, arguments);
-  }
-  """
+  fcall = match func-name
+  | '' => ""
+  | /^[\s,_]*<-/ => throw 'not yet'
+  | otherwise => ".#{func-name}"
+
+  console.log \fcall fcall
+  compile-livescript "-> plv8x.require '#{module}' #fcall ..."
