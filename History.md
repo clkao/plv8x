@@ -1,3 +1,7 @@
+0.4.3 / 2013-05-08
+==================
+  * Restore support for PostgreSQL 9.0
+
 0.4.2 / 2013-04-24
 ==================
   * Support injecting functions with callback callconv
