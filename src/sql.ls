@@ -27,12 +27,12 @@ COMMENT ON SCHEMA #name IS '#comment';
 export function plv8x-sql(drop=false, cascade=false)
   define-schema(\plv8x 'Out-of-table for loading plv8 modules', drop, cascade) + """
 
-CREATE TABLE IF NOT EXISTS plv8x.code (
+DO $$ BEGIN CREATE TABLE plv8x.code (
     name text,
     code text,
     load_seq int,
     updated timestamp
-);
+); EXCEPTION WHEN OTHERS THEN END; $$;
   """
 
 export function operators-sql()
