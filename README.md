@@ -158,18 +158,18 @@ We support both synchronous and async functions, as well as bare functions defin
 By default, the first two arguments to an async (back-call) function is taken
 to be `error` and `result` respectively:
 
-    % plv8x -f 'text fn(text)=pkg:'           # out = pkg(x)
-    % plv8x -f 'text fn(text)=pkg:method'     # out = pkg.method(in)
-    % plv8x -f 'text fn(text)=pkg:<-'         # pkg(x, cb(err, out))
-    % plv8x -f 'text fn(text)=pkg:<-method'   # pkg.method(x, cb(err, out))
+    % plv8x -f 'fn(text):text=pkg:'           # out = pkg(x)
+    % plv8x -f 'fn(text):text=pkg:method'     # out = pkg.method(in)
+    % plv8x -f 'fn(text):text=pkg:<-'         # pkg(x, cb(err, out))
+    % plv8x -f 'fn(text):text=pkg:<-method'   # pkg.method(x, cb(err, out))
 
 Using an underscore, one can specify exactly which async callback parameter
 to expect from the lifted function:
 
-    % plv8x -f 'text fn(text)=pkg:<-'         # pkg(x, cb(err, out))
-    % plv8x -f 'text fn(text)=pkg:_<-'        # pkg(x, cb(out))
-    % plv8x -f 'text fn(text)=pkg:,_<-'       # pkg(x, cb(_0, out))
-    % plv8x -f 'text fn(text)=pkg:,,_<-'      # pkg(x, cb(_0, _1, out))
+    % plv8x -f 'fn(text):text=pkg:<-'         # pkg(x, cb(err, out))
+    % plv8x -f 'fn(text):text=pkg:_<-'        # pkg(x, cb(out))
+    % plv8x -f 'fn(text):text=pkg:,_<-'       # pkg(x, cb(_0, out))
+    % plv8x -f 'fn(text):text=pkg:,,_<-'      # pkg(x, cb(_0, _1, out))
 
 # License
 

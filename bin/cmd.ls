@@ -68,7 +68,7 @@ switch
 | argv.delete =>
   plx.delete-bundle argv.delete, -> done!
 | argv.inject =>
-  [spec, source] = argv.inject.split \=
+  [spec, source] = argv.inject.split /\s*=\s*/
   plx.mk-user-func spec, source, ->
     console.log \ok spec
     done!

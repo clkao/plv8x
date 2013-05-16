@@ -71,7 +71,11 @@ class PLX
     @query q, bind, cb
 
   mk-user-func: (spec, source, cb) ->
-    [_, rettype, name, args] = spec.match /^([\.\w]+)?\s*(\w+)\((.*)\)$/ or throw "failed to parse #spec"
+    [_, rettype, name, args, rettype-after] = spec.match //^
+      (?:([\.\w]+) \s+)? (\w+) \( (.*) \) (?:\s*:\s*([\.\w]+))?
+    $// or throw "failed to parse #spec"
+
+    rettype ?= rettype-after
 
     param-obj = {}
     for arg, idx in args.split /\s*,\s*/
