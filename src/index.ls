@@ -78,10 +78,11 @@ class PLX
     rettype ?= rettype-after
 
     param-obj = {}
-    for arg, idx in args.split /\s*,\s*/
-      [_, type, param-name] = arg.match /^([\.\w]+)\s*(\w+)?$/ or throw "failed to parse param #arg"
-      param-name ?= "__#{idx}"
-      param-obj[param-name] = type
+    if args
+      for arg, idx in args.split /\s*,\s*/
+        [_, type, param-name] = arg.match /^([\.\w]+)\s*(\w+)?$/ or throw "failed to parse param #arg"
+        param-name ?= "__#{idx}"
+        param-obj[param-name] = type
 
     [_, pkg, expression] = source.match /^(\w*):(.*)$/ or throw "failed to parse source #source"
 
