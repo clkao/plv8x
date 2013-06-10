@@ -16,12 +16,12 @@ class PLX
 
   plv8x-eval: (code, cb) ->
     code = "(#code)()" if typeof code is \function
-    @query "select plv8x.eval($1) as ret", [code], -> cb JSON.parse it?0?ret
+    @query "select plv8x.eval($1) as ret", [code], -> cb it?0?ret
 
   plv8x-apply: (code, args, cb) ->
     code = "(#code)()" if typeof code is \function
     args = JSON.stringify args if typeof args isnt \string
-    @query "select plv8x.apply($1, $2) as ret", [code, args], -> cb JSON.parse it?0?ret
+    @query "select plv8x.apply($1, $2) as ret", [code, args], -> cb it?0?ret
 
   list: (cb) ->
     @query "select name, length(code) as length from plv8x.code", cb

@@ -16,11 +16,11 @@ describe 'db', -> ``it``
   .. 'eval', (done) ->
     <- plx.query "select plv8x.eval('plus_one = function(a) { return a + 1 }')"
     rows <- plx.query "select plv8x.apply($1, $2) as ret" [\plus_one, JSON.stringify [42]]
-    expect rows.0.ret .to.equal(\43)
+    expect rows.0.ret .to.equal 43
     done!
   .. 'evalit', (done) ->
     rows <- plx.query "select plv8x.apply($1, $2) as ret" ['function(a) { return a + 1}', JSON.stringify [42]]
-    expect rows.0.ret .to.equal \43
+    expect rows.0.ret .to.equal 43
     done!
   .. 'purge', (done) ->
     <- plx.purge
@@ -42,7 +42,7 @@ describe 'db', -> ``it``
     err, res <- plx.conn.query "select plv8x.eval($1) as ret", ["plv8x_require('LiveScript').VERSION"]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
-    expect ret .to.equal \"1.1.1"
+    expect ret .to.equal \1.1.1
     done!
   .. 'lscompile', (done) ->
     plx.conn.query plv8x._mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x.plv8x-lift "LiveScript", "compile"
@@ -64,5 +64,5 @@ describe 'db', -> ``it``
     err, res <- plx.conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx') as ret"""
     expect err .to.be.a('null');
     {ret} = res.rows.0
-    expect ret .to.equal \123
+    expect ret .to.equal 123
     done!

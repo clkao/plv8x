@@ -31,11 +31,11 @@ describe 'db', -> ``it``
     <- plx.import-bundle \LiveScript './node_modules/LiveScript/package.json'
     rows <- plx.query "select |> $1 as ret" ['~> plv8x.require "LiveScript" .VERSION']
     console.log rows
-    expect JSON.parse rows.0.ret .to.equal \1.1.1
+    expect rows.0.ret .to.equal \1.1.1
     done!
   .. 'livescript data |> ->', (done) ->
     rows <- plx.query "select $1 |> $2 as ret", [ JSON.stringify({ hello: [2, 3, 4] }), '-> @hello.1' ]
-    expect JSON.parse rows.0.ret .to.equal(3)
+    expect rows.0.ret .to.equal(3)
     done!
   .. 'livescript data |> expression', (done) ->
     rows <- plx.query "select $1 |> $2 as ret", [ JSON.stringify({ hello: [2, 3, 4] }), '@hello.1' ]
@@ -45,15 +45,15 @@ describe 'db', -> ``it``
     <- plx.import-bundle \LiveScript './node_modules/LiveScript/package.json'
     rows <- plx.query "select ~> $1 as ret" ['plv8x.require "LiveScript" .VERSION']
     console.log rows
-    expect JSON.parse rows.0.ret .to.equal \1.1.1
+    expect rows.0.ret .to.equal \1.1.1
     done!
   .. 'livescript data ~>', (done) ->
     rows <- plx.query "select $1 ~> $2 as ret", [ JSON.stringify({ hello: [2, 3, 4] }), '-@hello.1' ]
-    expect JSON.parse rows.0.ret .to.equal(-3)
+    expect rows.0.ret .to.equal(-3)
     done!
   .. 'livescript <~ data', (done) ->
     rows <- plx.query "select $2 <~ $1 as ret", [ JSON.stringify({ hello: [2, 3, 4] }), '-@hello.1' ]
-    expect JSON.parse rows.0.ret .to.equal(-3)
+    expect rows.0.ret .to.equal(-3)
     done!
 # Currently Borked -- pullreqs welcome
 /*
@@ -61,10 +61,10 @@ describe 'db', -> ``it``
     <- plx.import-bundle \coffee-script './node_modules/coffee-script/package.json'
     rows <- plx.query "select |> $1 as ret" ['=> "1.6.2"']
     console.log rows
-    expect JSON.parse rows.0.ret .to.equal \1.6.2
+    expect rows.0.ret .to.equal \1.6.2
     done!
   .. 'coffeescript data |> =>', (done) ->
     rows <- plx.query "select $1 |> $2 as ret", [ JSON.stringify({ hello: [2, 3, 4] }), '=> @hello[1]' ]
-    expect JSON.parse rows.0.ret .to.equal(3)
+    expect rows.0.ret .to.equal(3)
     done!
   */
