@@ -91,7 +91,7 @@ class PLX
       plv8x-lift pkg, expression
     else
       xpression-to-body expression
-    <~ @query _mk_func name, param-obj, rettype, body, {boot}
+    <~ @query _mk_func name, param-obj, rettype, body, {boot, +cascade}
 
     cb { rettype, name, param-obj, body }
 
