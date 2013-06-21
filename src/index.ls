@@ -84,7 +84,7 @@ class PLX
         param-name ?= "__#{idx}"
         param-obj[param-name] = type
 
-    [_, pkg, expression] = source.match /^(\w*):(.*)$/ or throw "failed to parse source #source"
+    [_, pkg, expression] = source.match /^(\w*):([\S\s]*)$/ or throw "failed to parse source #source"
 
     body = if pkg
       boot = true
