@@ -72,7 +72,7 @@ class PLX
 
   mk-user-func: (spec, source, cb) ->
     [_, rettype, name, args, rettype-after] = spec.match //^
-      (?:([\.\w]+) \s+)? (\w+) \( (.*) \) (?:\s*:\s*([\.\w]+))?
+      (?:([\.\w]+) \s+)? (\w+) \( (.*) \) (?:\s*:\s*([\.\s\w]+))?
     $// or throw "failed to parse #spec"
 
     rettype ?= rettype-after
