@@ -117,8 +117,9 @@ export function connect(db)
     ..connect!
 
 export function xpression-to-body(code)
-  cls = if plv8? then plv8x.compile-livescript else compile-livescript
+  clivescript = if plv8? then plv8x.compile-livescript else compile-livescript
   ccoffee = if plv8? then plv8x.compile-coffeescript else compile-coffeescript
+  cls = -> "(function () {return #{clivescript it} })()"
   match code
   | /^\s*->/     => cls code
   | /^\s*~>/     => cls code.replace /~>/ \->
