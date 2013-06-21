@@ -1,3 +1,10 @@
+0.4.4 / 2013-06-21
+==================
+  * Fix -f with injected code that uses LiveScript primtives like $import
+  * More reliable mk_func with existing functions being used in views
+  * Allow specifying -f return type with a trailing colon
+  * Fix -f functions without args
+
 0.4.3 / 2013-05-08
 ==================
   * Restore support for PostgreSQL 9.0
