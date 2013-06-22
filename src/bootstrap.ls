@@ -36,24 +36,28 @@ DO $$ BEGIN
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
 
-    if pg_version < \9.2.0
+    if pg_version >= 9.1.0 and pg_version < \9.2.0
       ..query '''
 DO $$ BEGIN
-    CREATE FUNCTION plv8x.json_syntax_check(src text) RETURNS boolean AS '
-        try { JSON.parse(src); return true; } catch (e) { return false; }
-    ' LANGUAGE plv8 IMMUTABLE;
-EXCEPTION WHEN OTHERS THEN END; $$;
-
-DO $$ BEGIN
-    CREATE DOMAIN plv8x.json AS text CHECK ( plv8x.json_syntax_check(VALUE) );
+    CREATE EXTENSION json WITH SCHEMA pg_catalog;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
+    if pg_version < \9.1.0
+      throw "json extension required"
     else
       ..query '''
 DO $$ BEGIN
     CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
+      ..query '''
+select oid from pg_catalog.pg_type  where typname = 'json' and typtype ='b';
+      ''', [], (err, res) ~>
+        if res?rows?0
+          @register-json-type that.oid
+        else
+          throw "please install json_91 extension from: https://bitbucket.org/adunstan/json_91/src"
+
   @conn
     ..query _mk_func \plv8x.boot {} \void _boot
     ..query _mk_func \plv8x.eval {str: \text} \plv8x.json _eval

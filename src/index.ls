@@ -1,7 +1,12 @@
+require! pg
+
 class PLX
   (@conn) ->
     @eval = @plv8x-eval
     @ap = @plv8x-apply
+
+  register-json-type: (oid) ->
+    pg.types.setTypeParser oid, 'text', JSON.parse.bind JSON
 
   bootstrap: (...args) ->
     require \./bootstrap .apply @, args
@@ -112,7 +117,6 @@ exports.new = (db, cb) ->
   cb? plx
 
 export function connect(db)
-  require! pg
   new pg.Client db
     ..connect!
 

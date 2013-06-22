@@ -25,7 +25,7 @@ scripts:
 engines: {node: '*'}
 dependencies:
   optimist: \0.3.x
-  pg: \1.3.x
+  pg: \2.0.x
   resolve: \0.3.x
   one: \2.5.x
   tmp: '0.0.x'
