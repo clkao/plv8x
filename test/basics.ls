@@ -66,3 +66,9 @@ describe 'db', -> ``it``
     {ret} = res.rows.0
     expect ret .to.equal 123
     done!
+  .. 'required object persistency', (done) ->
+    err, res <- plx.conn.query """select plv8x.json_eval('{"a": 1}'::json, '@b=2; @') as ret"""
+    expect(err).to.be.a('null');
+    {ret} = res.rows.0
+    expect ret .to.be.deep.equal a: 1, b: 2
+    done!
