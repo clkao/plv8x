@@ -119,6 +119,7 @@ exports.new = (db, cb) ->
   cb? plx
 
 export function connect(db)
+  require! pg
   new pg.Client db
     ..connect!
 
