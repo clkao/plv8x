@@ -1,12 +1,7 @@
-require! pg
-
 class PLX
   (@conn) ->
     @eval = @plv8x-eval
     @ap = @plv8x-apply
-
-  register-json-type: (oid) ->
-    pg.types.setTypeParser oid, 'text', JSON.parse.bind JSON
 
   bootstrap: (...args) ->
     require \./bootstrap .apply @, args
@@ -109,8 +104,15 @@ class PLX
 
 exports.new = (db, cb) ->
   db = "tcp://localhost/#db" if db.indexOf('/') < 0
-  conn = connect db
+  require! pg
+
+  conn = new pg.Client db
+    ..connect!
   plx = new PLX conn
+
+  plx.register-json-type = (oid) ->
+    pg.types.setTypeParser oid, 'text', JSON.parse.bind JSON
+
   <- plx.bootstrap
   <- plx.query 'select plv8x.boot()'
   <- plx.import-bundle \plv8x require.resolve \../package.json
