@@ -36,14 +36,15 @@ DO $$ BEGIN
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
 
-    if pg_version >= 9.1.0 and pg_version < \9.2.0
+    if pg_version >= \9.1.0 and pg_version < \9.2.0
       ..query '''
 DO $$ BEGIN
-    CREATE EXTENSION json WITH SCHEMA pg_catalog;
+    CREATE EXTENSION IF NOT EXISTS json WITH SCHEMA pg_catalog;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
+
     if pg_version < \9.1.0
-      throw "json extension required"
+      throw "json extension required, this is not supported for pg 9.0 yet"
     else
       ..query '''
 DO $$ BEGIN
