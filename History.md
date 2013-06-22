@@ -1,3 +1,8 @@
+0.5.0 / 2013-06-22
+==================
+  * Update to use node-pg 2.0
+  * Properly handle json return type, no more manual parse required
+
 0.4.4 / 2013-06-21
 ==================
   * Fix -f with injected code that uses LiveScript primtives like $import
