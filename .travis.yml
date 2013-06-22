@@ -3,7 +3,7 @@ before_script:
   - "sudo apt-get install libv8-dev"
   - "sudo pgxn install plv8"
   - "git clone https://bitbucket.org/adunstan/json_91.git"
-  - "cd json_91; make all install; cd .."
+  - "cd json_91; sudo make all install; cd .."
   - "psql -c 'create database test' -U postgres"
 
 script:
