@@ -47,18 +47,19 @@ DO $$ BEGIN
             FROM pg_catalog.pg_type  where typname = 'text');
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
+      ..query '''
+  select oid from pg_catalog.pg_type  where typname = 'json' and typtype ='b';
+      ''', [], (err, res) ~>
+        if res?rows?0
+          @register-json-type that.oid
+        else
+          throw "json type not found"
+
     ..query '''
 DO $$ BEGIN
   CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
-    ..query '''
-select oid from pg_catalog.pg_type  where typname = 'json' and typtype ='b';
-    ''', [], (err, res) ~>
-      if res?rows?0
-        @register-json-type that.oid
-      else
-        throw "json type not found"
 
   @conn
     ..query _mk_func \plv8x.boot {} \void _boot
