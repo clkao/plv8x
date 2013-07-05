@@ -35,29 +35,30 @@ DO $$ BEGIN
   CREATE TRUSTED LANGUAGE plls HANDLER plls_call_handler INLINE plls_inline_handler VALIDATOR plls_call_validator;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
-
-    if pg_version >= \9.1.0 and pg_version < \9.2.0
+    if pg_version < \9.2.0
       ..query '''
 DO $$ BEGIN
-    CREATE EXTENSION IF NOT EXISTS json WITH SCHEMA pg_catalog;
+    INSERT INTO pg_catalog.pg_type (SELECT 'json' AS typname,
+            typnamespace , typowner , typlen , typbyval , typtype , typcategory
+            , typispreferred , typisdefined , typdelim , typrelid , typelem ,
+            typarray , typinput , typoutput , typreceive , typsend  , typmodin
+            , typmodout , typanalyze , typalign , typstorage , typnotnull ,
+            typbasetype , typtypmod , typndims , typdefaultbin , typdefault
+            FROM pg_catalog.pg_type  where typname = 'text');
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
-
-    if pg_version < \9.1.0
-      throw "json extension required, this is not supported for pg 9.0 yet"
-    else
-      ..query '''
+    ..query '''
 DO $$ BEGIN
-    CREATE DOMAIN plv8x.json AS json;
+  CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
-      ..query '''
+    ..query '''
 select oid from pg_catalog.pg_type  where typname = 'json' and typtype ='b';
-      ''', [], (err, res) ~>
-        if res?rows?0
-          @register-json-type that.oid
-        else
-          throw "please install json_91 extension from: https://bitbucket.org/adunstan/json_91/src"
+    ''', [], (err, res) ~>
+      if res?rows?0
+        @register-json-type that.oid
+      else
+        throw "json type not found"
 
   @conn
     ..query _mk_func \plv8x.boot {} \void _boot
