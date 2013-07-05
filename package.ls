@@ -19,8 +19,8 @@ scripts:
     env PATH="./node_modules/.bin:$PATH" mocha'
   prepublish: """
     env PATH="./node_modules/.bin:$PATH" lsc -cj package.ls &&
-    lsc -bc bin &&
-    lsc -bc -o lib src
+    env PATH="./node_modules/.bin:$PATH" lsc -bc bin &&
+    env PATH="./node_modules/.bin:$PATH" lsc -bc -o lib src
   """
 engines: {node: '*'}
 dependencies:
