@@ -1,3 +1,8 @@
+0.5.1 / 2013-07-05
+==================
+  * add primary key to plv8x.code name
+  * ignore pgrest and express when bundling
+
 0.5.0 / 2013-06-22
 ==================
   * Update to use node-pg 2.0
