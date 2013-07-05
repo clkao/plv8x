@@ -28,7 +28,7 @@ export function plv8x-sql(drop=false, cascade=false)
   define-schema(\plv8x 'Out-of-table for loading plv8 modules', drop, cascade) + """
 
 DO $$ BEGIN CREATE TABLE plv8x.code (
-    name text,
+    name text PRIMARY KEY,
     code text,
     load_seq int,
     updated timestamp
