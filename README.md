@@ -8,17 +8,23 @@ procedural language support.
 
 # Install plv8js
 
-Note: Requires postgresql 9.1 or later.  9.0 will be supported soon.
+Note: Requires postgresql 9.0 or later.
+
+[postgresql PGDG apt respository](http://wiki.postgresql.org/wiki/Apt) now ships plv8js extension:
 
 ```
-# for older distros: sudo add-apt-repository ppa:martinkl/ppa
-sudo apt-get install libv8-dev
+wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install postgresql-9.2-plv8
+```
 
+Or you can install with pgxnclient:
+
+
+```
 sudo easy_install pgxnclient
 sudo pgxn install plv8
 ```
-
-If you have trouble installing plv8 on MacOSX, try the fork that includes unmerged patches for build fixes here: https://github.com/clkao/plv8js
 
 # Install plv8x
 
@@ -53,21 +59,21 @@ Now create some test data with json columns: (example table from [Postgres 9.3 f
 Instead of `b->'f1'`, we use `b~>'this.f1'`, which means bind `b` as `this` and evaluate the right hand side (`this.f1`):
 
     test=# SELECT b~>'this.f1' AS f1, b~>'this.f3' AS f3 FROM aa WHERE a = 1;
-     f1 |         f3         
+     f1 |         f3
     ----+--------------------
      1  | "Hi I'm \"Daisy\""
 
 If you like coffee, `@` works too:
 
     test=# SELECT b~>'@f1' AS f1, b~>'@f3' AS f3 FROM aa WHERE a = 1;
-     f1 |         f3         
+     f1 |         f3
     ----+--------------------
      1  | "Hi I'm \"Daisy\""
 
 For multiple keys, you can of course do `b~>'@f1'~>'@f12'`, but single expression will do:
 
     test=# SELECT b~>'@f1'~>'@f12' as f12_long, b~>'@f1.f12' AS f12 FROM aa WHERE a = 2;
-     f12_long | f12 
+     f12_long | f12
     ----------+-----
      12       | 12
 
@@ -81,7 +87,7 @@ Ditto for arrays:
 Unary `~>` for just evaluating the expression:
 
     test=# SELECT ~>'[1 to 10]' AS f1
-               f1           
+               f1
     ------------------------
      [1,2,3,4,5,6,7,8,9,10]
 
@@ -131,13 +137,13 @@ Let's try reusing some existing npm modules:
 
     # parse a query string
     test=# select ~>'require("qs").parse("foo=bar&baz=1")' as qs;
-               qs            
+               qs
     -------------------------
      {"foo":"bar","baz":"1"}
 
     # actually use the parsed query string as json
     test=# select qs~>'@foo' as foo from  (select ~>'require("qs").parse("foo=bar&baz=1")' as qs) a;
-      foo  
+      foo
     -------
      "bar"
 
@@ -146,7 +152,7 @@ Let's try reusing some existing npm modules:
     ok plv8x.json parse_qs(text)
     # Now parse_qs is a postgresql function:
     test=# select parse_qs('foo=bar&baz=1') as qs;
-               qs            
+               qs
     -------------------------
      {"foo":"bar","baz":"1"}
 
