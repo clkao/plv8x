@@ -36,17 +36,18 @@ DO $$ BEGIN
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
     if pg_version < \9.2.0
-      ..query '''
+      ..query """
 DO $$ BEGIN
     INSERT INTO pg_catalog.pg_type (SELECT 'json' AS typname,
             typnamespace , typowner , typlen , typbyval , typtype , typcategory
             , typispreferred , typisdefined , typdelim , typrelid , typelem ,
             typarray , typinput , typoutput , typreceive , typsend  , typmodin
             , typmodout , typanalyze , typalign , typstorage , typnotnull ,
-            typbasetype , typtypmod , typndims , typdefaultbin , typdefault
+            typbasetype , typtypmod , typndims , #{ if pg_version < \9.1.0 => '' else 'typcollation ,' }
+            typdefaultbin , typdefault
             FROM pg_catalog.pg_type  where typname = 'text');
 EXCEPTION WHEN OTHERS THEN END; $$;
-'''
+"""
       ..query '''
   select oid from pg_catalog.pg_type  where typname = 'json' and typtype ='b';
       ''', [], (err, res) ~>
