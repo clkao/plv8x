@@ -1,3 +1,8 @@
+0.5.2 / 2013-07-10
+==================
+  * Restore pg 9.1 support
+  * Update to use node-pg 2.1
+
 0.5.1 / 2013-07-05
 ==================
   * add primary key to plv8x.code name
