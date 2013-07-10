@@ -14,7 +14,8 @@ before_install:
   - sudo /etc/init.d/postgresql restart
 
 before_script:
-  - "psql -c 'create database test' -U postgres"
+  - createuser -U postgres travis
+  - psql -c 'create database test' -U postgres
 
 script:
   - "TESTDBNAME=test npm run test"
