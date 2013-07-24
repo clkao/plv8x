@@ -34,7 +34,7 @@ class PLX
 
   _bundle: (name, manifest, cb) ->
     require! <[one tmp path fs]>
-    exclude = <[one pg plv8x pgrest express ]>
+    exclude = <[one pg plv8x pgrest express optimist]>
 
     if name is \pgrest
       # XXX temporary solution till we get proper manifest exclusion going
