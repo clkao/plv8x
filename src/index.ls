@@ -70,6 +70,21 @@ class PLX
       ["insert into plv8x.code (name, code) values($1, $2)" [name, code]]
     @query q, bind, cb
 
+  import-funcs: (name, pkg, bootstrap, cb) ->
+    funcs = for func, f of pkg when f.$plv8x and f.$bootstrap is bootstrap => let func, f
+      (done) ~> @mk-user-func "#func#{f.$plv8x}" "#name:#func", done
+    require! async
+    <- async.waterfall funcs
+    cb!
+
+  import-bundle-funcs: (name, manifest, body) ->
+    pkg = require (manifest - /package\.json$/)
+    <~ @import-funcs name, pkg, true
+    <~ @import-bundle name, manifest
+    cb <~ body
+    <~ @import-funcs name, pkg, void
+    cb!
+
   mk-user-func: (spec, source, cb) ->
     [_, rettype, name, args, rettype-after] = spec.match //^
       (?:([\.\w]+) \s+)? (\w+) \( (.*) \) (?:\s*:\s*([\.\s\w]+))?

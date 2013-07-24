@@ -24,6 +24,7 @@ scripts:
   """
 engines: {node: '*'}
 dependencies:
+  async: \0.2.x
   optimist: \0.3.x
   pg: \2.1.x
   resolve: \0.3.x
