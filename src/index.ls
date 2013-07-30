@@ -72,7 +72,7 @@ class PLX
 
   import-funcs: (name, pkg, bootstrap, cb) ->
     funcs = for func, f of pkg when f.$plv8x and f.$bootstrap is bootstrap => let func, f
-      (done) ~> @mk-user-func "#func#{f.$plv8x}" "#name:#func", done
+      (done) ~> @mk-user-func "#func#{f.$plv8x}" "#name:#func", -> done!
     require! async
     <- async.waterfall funcs
     cb!
