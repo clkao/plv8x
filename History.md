@@ -1,3 +1,7 @@
+0.5.4 / 2013-08-06
+==================
+  * functions can now be marked to be imported in bootstrap stage
+
 0.5.3 / 2013-07-25
 ==================
   * import-bundle-funcs
