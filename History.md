@@ -1,3 +1,7 @@
+0.5.5 / 2013-08-13
+==================
+  * Fix object-style pg connection info
+
 0.5.4 / 2013-08-06
 ==================
   * functions can now be marked to be imported in bootstrap stage
