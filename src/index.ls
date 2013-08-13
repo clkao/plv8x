@@ -118,7 +118,8 @@ class PLX
       plx[key] ...rest
 
 exports.new = (db, cb) ->
-  db = "tcp://localhost/#db" if db.indexOf('/') < 0
+  # db can aslo be an object, mostly for connceting with local socket
+  db = "tcp://localhost/#db" if \string is typeof db && db.indexOf('/') < 0
   require! pg
 
   conn = new pg.Client db
