@@ -27,9 +27,9 @@ notifications:
 language: node_js
 
 env:
-  - global:
+  global:
     - PGDG=precise-pgdg
-  - matrix:
+  matrix:
     - PGVERSION=9.3 PGDG=precise-pgdg-testing
     - PGVERSION=9.2
     - PGVERSION=9.1
