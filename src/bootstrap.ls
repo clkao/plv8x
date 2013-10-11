@@ -55,12 +55,17 @@ EXCEPTION WHEN OTHERS THEN END; $$;
           @register-json-type that.oid
         else
           throw "json type not found"
-
     ..query '''
 DO $$ BEGIN
   CREATE DOMAIN plv8x.json AS json;
 EXCEPTION WHEN OTHERS THEN END; $$;
 '''
+    if pg_version < \9.2.0
+      @mk-user-func "plv8x.json row_to_json(anyelement)", ':-> it', ->
+      @mk-user-func "plv8x.json array_to_json(anyarray)", ':-> it', ->
+
+    if pg_version < \9.3.0
+      @mk-user-func "plv8x.json to_json(anyelement)", ':-> it', ->
 
   @conn
     ..query _mk_func \plv8x.boot {} \void _boot
