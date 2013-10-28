@@ -25,12 +25,12 @@ scripts:
 engines: {node: '*'}
 dependencies:
   async: \0.2.x
-  optimist: \0.3.x
-  pg: \2.1.x
-  resolve: \0.3.x
+  optimist: \0.6.x
+  pg: \2.8.x
+  resolve: \0.5.x
   one: \2.5.x
   tmp: '0.0.x'
-  LiveScript: \1.1.1
+  LiveScript: \1.1.x
 #  'coffee-script': \*
   'js-yaml': \*
 devDependencies:
