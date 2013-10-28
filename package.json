@@ -24,7 +24,7 @@
   },
   "scripts": {
     "test": "ln -sf ../../../bundled_modules/util node_modules/sequelize/node_modules/ &&ln -sf ../../../bundled_modules/events node_modules/sequelize/node_modules/ &&env PATH=\"./node_modules/.bin:$PATH\" mocha",
-    "prepublish": "env PATH=\"./node_modules/.bin:$PATH\" lsc -cj package.ls &&\nenv PATH=\"./node_modules/.bin:$PATH\" lsc -bc bin &&\nenv PATH=\"./node_modules/.bin:$PATH\" lsc -bc -o lib src"
+    "prepublish": "env PATH=\"./node_modules/.bin:$PATH\" lsc -cj package.ls &&\nenv PATH=\"./node_modules/.bin:$PATH\" lsc -bpc bin/cmd.ls > bin/cmd.js &&\nenv PATH=\"./node_modules/.bin:$PATH\" lsc -bc -o lib src"
   },
   "engines": {
     "node": "*"
