@@ -1,4 +1,8 @@
-0.5.5 / 2013-08-13
+0.6.0 / 2013-10-28
+==================
+  * Support pg 9.3
+  * polyfill row_to_json, array_to_json, to_json
+
 ==================
   * Fix object-style pg connection info
 
