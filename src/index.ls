@@ -120,7 +120,7 @@ class PLX
 exports.new = (db, cb) ->
   # db can aslo be an object, mostly for connceting with local socket
   db = "tcp://localhost/#db" if \string is typeof db && db.indexOf('/') < 0
-  require! pg
+  pg = require \pg .native
 
   conn = new pg.Client db
     ..connect!
