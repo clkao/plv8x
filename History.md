@@ -1,3 +1,7 @@
+0.6.2 / 2013-11-16
+==================
+  * Support array types for user-funcs
+
 0.6.1 / 2013-11-06
 ==================
   * Use native pg
