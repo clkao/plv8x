@@ -87,7 +87,7 @@ class PLX
 
   mk-user-func: (spec, source, cb) ->
     [_, rettype, name, args, rettype-after] = spec.match //^
-      (?:([\.\w]+) \s+)? (\w+) \( (.*) \) (?:\s*:\s*([\.\s\w]+))?
+      (?:([\.\w]+) \s+)? (\w+) \( (.*) \) (?:\s*:\s*([\.\s\w\[\]]+))?
     $// or throw "failed to parse #spec"
 
     rettype ?= rettype-after
@@ -95,7 +95,7 @@ class PLX
     param-obj = {}
     if args
       for arg, idx in args.split /\s*,\s*/
-        [_, type, param-name] = arg.match /^([\.\w]+)\s*(\w+)?$/ or throw "failed to parse param #arg"
+        [_, type, param-name] = arg.match /^([\.\w\[\]]+)\s*(\w+)?$/ or throw "failed to parse param #arg"
         param-name ?= "__#{idx}"
         param-obj[param-name] = type
 
