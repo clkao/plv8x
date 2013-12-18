@@ -1,7 +1,7 @@
 should = (require \chai).should!
 
 expect = (require \chai).expect
-var plx, plv8x, conString
+var plx, plv8x, conString, pg_version
 describe 'db', -> ``it``
   .. 'loaded successfully.', (done) ->
     # Load home page
@@ -11,8 +11,14 @@ describe 'db', -> ``it``
     _plx <- plv8x.new conString
     plx := _plx
     plx.should.be.ok
+    rows <- plx.query "select version()"
+    [, pg_version] := rows.0.version.match /^PostgreSQL ([\d\.]+)/
     done!
   .. 'poly-func', (done) ->
+    if pg_version < \9.2.0
+      it.skip 'skipped for < 9.2', ->
+      return done!
+
     <- plx.mk-user-func "plv8x.json polyelement(anyelement)", ':-> it'
     err, res <- plx.conn.query """
       select polyelement(names) as ret
@@ -25,6 +31,9 @@ describe 'db', -> ``it``
     ]
     done!
   .. 'poly-func-array', (done) ->
+    if pg_version < \9.2.0
+      it.skip 'skipped for < 9.2', ->
+      return done!
     <- plx.mk-user-func "plv8x.json polyarray(anyarray)", ':-> it'
     err, res <- plx.conn.query """
       select polyarray(array_agg(_)) as ret from
