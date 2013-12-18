@@ -1,3 +1,7 @@
+0.6.3 / 2013-12-18
+  * Allow options in plv8x.new:
+    * `client` flag to assume plv8x bootstrapped
+
 0.6.2 / 2013-11-16
 ==================
   * Support array types for user-funcs
