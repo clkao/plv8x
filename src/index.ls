@@ -117,7 +117,10 @@ class PLX
       plx = new PLX conn
       plx[key] ...rest
 
-exports.new = (db, cb) ->
+exports.new = (db, config, cb) ->
+  if \function is typeof config
+    cb = config
+    config = {}
   # db can aslo be an object, mostly for connceting with local socket
   db = "tcp://localhost/#db" if \string is typeof db && db.indexOf('/') < 0
   pg = require \pg .native
@@ -128,6 +131,8 @@ exports.new = (db, cb) ->
 
   plx.register-json-type = (oid) ->
     pg.types.setTypeParser oid, 'text', JSON.parse.bind JSON
+
+  return cb? plx if config.client
 
   <- plx.bootstrap
   <- plx.query 'select plv8x.boot()'
