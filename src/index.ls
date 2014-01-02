@@ -132,7 +132,8 @@ exports.new = (db, config, cb) ->
   plx.register-json-type = (oid) ->
     pg.types.setTypeParser oid, 'text', JSON.parse.bind JSON
 
-  return cb? plx if config.client
+  if config.client
+    return plx.query 'select plv8x.boot()' -> cb? plx
 
   <- plx.bootstrap
   <- plx.query 'select plv8x.boot()'
