@@ -1,3 +1,6 @@
+0.6.4 / 2014-01-05
+  * Fix plv8x not bootstrapped when client flag is specified
+
 0.6.3 / 2013-12-18
   * Allow options in plv8x.new:
     * `client` flag to assume plv8x bootstrapped
