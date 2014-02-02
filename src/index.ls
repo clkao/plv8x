@@ -71,8 +71,8 @@ class PLX
     @query q, bind, cb
 
   import-funcs: (name, pkg, bootstrap, cb) ->
-    funcs = for func, f of pkg when f.$plv8x and f.$bootstrap is bootstrap => let func, f
-      (done) ~> @mk-user-func "#func#{f.$plv8x}" "#name:#func", -> done!
+    funcs = for funcname, f of pkg when \function is typeof f and f.$plv8x and f.$bootstrap is bootstrap => let funcname, f
+      (done) ~> @mk-user-func "#funcname#{f.$plv8x}" "#name:#funcname", -> done!
     require! async
     <- async.waterfall funcs
     cb!
