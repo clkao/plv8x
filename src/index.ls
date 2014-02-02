@@ -222,3 +222,5 @@ export function plv8x-lift(module, func-name)
     """
   else
     compile-livescript "-> plv8x.require '#{module}' #fcall ..."
+
+export define-schema = require \./sql .define-schema
