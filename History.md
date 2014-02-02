@@ -1,3 +1,6 @@
+0.6.5 / 2014-02-03
+  * Export `util`, which comes with the define-schema helper
+
 0.6.4 / 2014-01-05
   * Fix plv8x not bootstrapped when client flag is specified
 

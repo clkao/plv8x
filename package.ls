@@ -4,7 +4,7 @@ author:
   email: 'clkao@clkao.org'
 name: 'plv8x'
 description: 'Use JavaScript expressions and modules in PostgreSQL plv8'
-version: '0.6.4'
+version: '0.6.5'
 keywords: <[postgres pg database plv8]>
 main: \lib/index.js
 bin:
@@ -27,12 +27,12 @@ dependencies:
   async: \0.2.x
   optimist: \0.6.x
   pg: \2.8.x
-  resolve: \0.5.x
+  resolve: \0.6.x
   one: \2.5.x
   tmp: '0.0.x'
-  LiveScript: \1.1.x
+  LiveScript: \1.2.0
 #  'coffee-script': \*
-  'js-yaml': \*
+  'js-yaml': \3.0.x
 devDependencies:
   mocha: \*
   chai: \*

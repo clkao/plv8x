@@ -31,7 +31,7 @@ describe 'db', -> ``it``
     <- plx.import-bundle \LiveScript './node_modules/LiveScript/package.json'
     rows <- plx.query "select |> $1 as ret" ['~> plv8x.require "LiveScript" .VERSION']
     console.log rows
-    expect rows.0.ret .to.equal \1.1.1
+    expect rows.0.ret .to.equal \1.2.0
     done!
   .. 'livescript data |> ->', (done) ->
     rows <- plx.query "select $1 |> $2 as ret", [ JSON.stringify({ hello: [2, 3, 4] }), '-> @hello.1' ]
@@ -45,7 +45,7 @@ describe 'db', -> ``it``
     <- plx.import-bundle \LiveScript './node_modules/LiveScript/package.json'
     rows <- plx.query "select ~> $1 as ret" ['plv8x.require "LiveScript" .VERSION']
     console.log rows
-    expect rows.0.ret .to.equal \1.1.1
+    expect rows.0.ret .to.equal \1.2.0
     done!
   .. 'livescript data ~>', (done) ->
     rows <- plx.query "select $1 ~> $2 as ret", [ JSON.stringify({ hello: [2, 3, 4] }), '-@hello.1' ]
