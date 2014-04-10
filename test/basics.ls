@@ -58,6 +58,10 @@ describe 'db', -> ``it``
     {ret} = res.rows.0
     expect (eval ret)! .to.equal 42
     done!
+  .. 'mk-user-func with dash-separated source', (done) ->
+    <- plx.mk-user-func "plv8x.json patch_json(json, json[])", "fast-json-patch:apply"
+    it.body.should.match /return plv8x.require\('fast-json-patch'\).apply.apply\(this, arguments\)/
+    done!
   .. 'required object persistency', (done) ->
     err, res <- plx.conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx = 123')"""
     expect(err).to.be.a('null');
