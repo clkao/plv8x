@@ -28,7 +28,7 @@ dependencies:
   optimist: \0.6.x
   pg: \2.8.x
   resolve: \0.6.x
-  one: \2.5.x
+  browserify: '^3.46.1'
   tmp: '0.0.x'
   LiveScript: \1.2.0
 #  'coffee-script': \*

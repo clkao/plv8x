@@ -33,28 +33,20 @@ class PLX
     @query "delete from plv8x.code where name = $1" [name], -> cb it.rows
 
   _bundle: (name, manifest, cb) ->
-    require! <[one tmp path fs]>
-    exclude = <[one pg plv8x pgrest express optimist]>
+    require! <[browserify fs]>
+    exclude = <[one browserify pg plv8x pgrest express optimist]>
 
     if name is \pgrest
       # XXX temporary solution till we get proper manifest exclusion going
       exclude ++= <[express cors gzippo connect-csv]>
 
-    err, tmpfile <~ tmp.tmpName
+    b = browserify!
+    b.require manifest - /\package\.json$/, {+entry}
+    require! 'stream-buffers'
+    buffer = new stream-buffers.WritableStreamBuffer!
+    buffer.on \close -> cb buffer.get-contents-as-string!
 
-    function replacer re, to then -> it.replace re, to
-    camelize = replacer /-[a-z]/ig -> it.char-at 1 .to-upper-case!
-    # XXX one 2.0.8 bug: absolute manifest doesn't work
-    o = one path.relative process.cwd!, manifest
-      .exclude ...exclude
-      .name camelize name
-
-    # XXX some way of injecting node core modules later
-    if name is \sequelize
-      o.dependency \util \* .dependency \events \*
-    err, bundle <- o.save
-    throw err if err
-    cb bundle
+    b.bundle {exclude, +ignoreMissing, standalone: name, -derequire} .pipe buffer
 
   import-bundle: (name, manifest, cb) ->
     bundle_from = (name, m, cb) ~>
