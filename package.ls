@@ -14,8 +14,6 @@ repository:
   url: 'git://github.com/clkao/plv8x.git'
 scripts:
   test: '
-    ln -sf ../../../bundled_modules/util node_modules/sequelize/node_modules/ &&
-    ln -sf ../../../bundled_modules/events node_modules/sequelize/node_modules/ &&
     env PATH="./node_modules/.bin:$PATH" mocha'
   prepublish: """
     env PATH="./node_modules/.bin:$PATH" lsc -cj package.ls &&
