@@ -29,6 +29,7 @@ dependencies:
   pg: \2.8.x
   resolve: \0.6.x
   browserify: '^3.46.1'
+  'stream-buffers': '^0.2.5'
   tmp: '0.0.x'
   LiveScript: \1.2.0
 #  'coffee-script': \*
