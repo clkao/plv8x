@@ -26,6 +26,10 @@ sudo easy_install pgxnclient
 sudo pgxn install plv8
 ```
 
+# Install LiveScript (pre-requisite)
+
+    % npm i -g LiveScript
+
 # Install plv8x
 
     % git clone git://github.com/clkao/plv8x.git; cd plv8x
