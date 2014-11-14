@@ -48,6 +48,12 @@ so there's no need to type `-d` over and over again on the command line:
 
     % export PLV8XDB=test
 
+To connect with `ident` (local Unix user) authentication, specify the path
+to the socket directory with `-d`:
+
+    % plv8x -d /var/run/postgresql -l
+    plv8x: 491425 bytes
+
 Now create some test data with json columns: (example table from [Postgres 9.3 feature highlight: JSON operators](http://michael.otacoo.com/postgresql-2/postgres-9-3-feature-highlight-json-operators/))
 
     % psql test
