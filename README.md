@@ -82,7 +82,7 @@ If you like coffee, `@` works too:
 
 For multiple keys, you can of course do `b~>'@f1'~>'@f12'`, but single expression will do:
 
-    test=# SELECT b~>'@f1'~>'@f12' as f12_long, b~>'@f1.f12' AS f12 FROM aa WHERE a = 2;
+    test=# SELECT b~>'@f1'~>'@f12' AS f12_long, b~>'@f1.f12' AS f12 FROM aa WHERE a = 2;
      f12_long | f12
     ----------+-----
      12       | 12
@@ -104,35 +104,35 @@ Unary `~>` for just evaluating the expression:
 `~>` is actually a shorthand for `|> '~>...'`.  Using raw `|>` for plain
 old javascript:
 
-    test=# select '{"foo": [1,2,3]}'::json |> 'function() { return this.foo[1] }';
+    test=# SELECT '{"foo": [1,2,3]}'::json |> 'function() { return this.foo[1] }';
      ?column?
     ----------
      2
 
 Expression works too:
 
-    test=# select '{"foo": [1,2,3]}'::json |> 'return this.foo[1]';
+    test=# SELECT '{"foo": [1,2,3]}'::json |> 'return this.foo[1]';
      ?column?
     ----------
      2
 
 CoffeeScript:
 
-    test=# select '{"foo": [1,2,3]}'::json |> '@foo[1]';
+    test=# SELECT '{"foo": [1,2,3]}'::json |> '@foo[1]';
      ?column?
     ----------
      2
 
 ```<|``` is ```|>``` reversed:
 
-    test=# select '@foo.1 * 5' <| '{"foo": [1,2,3]}'::json
+    test=# SELECT '@foo.1 * 5' <| '{"foo": [1,2,3]}'::json
      ?column?
     ----------
      10
 
 ```|>``` as unary operator:
 
-    test=# select |> '~> plv8x.require "LiveScript" .compile "-> \Hello" {+bare}';
+    test=# SELECT |> '~> plv8x.require "LiveScript" .compile "-> \Hello" {+bare}';
                    ?column?
     --------------------------------------
      "(function(){\n  return Hello;\n});"
@@ -146,13 +146,13 @@ Let's try reusing some existing npm modules:
     % psql test
 
     # parse a query string
-    test=# select ~>'require("qs").parse("foo=bar&baz=1")' as qs;
+    test=# SELECT ~>'require("qs").parse("foo=bar&baz=1")' AS qs;
                qs
     -------------------------
      {"foo":"bar","baz":"1"}
 
     # actually use the parsed query string as json
-    test=# select qs~>'@foo' as foo from  (select ~>'require("qs").parse("foo=bar&baz=1")' as qs) a;
+    test=# SELECT qs~>'@foo' AS foo FROM  (SELECT ~>'require("qs").parse("foo=bar&baz=1")' AS qs) a;
       foo
     -------
      "bar"
@@ -161,7 +161,7 @@ Let's try reusing some existing npm modules:
     % plv8x -f 'plv8x.json parse_qs(text)=qs:parse'
     ok plv8x.json parse_qs(text)
     # Now parse_qs is a postgresql function:
-    test=# select parse_qs('foo=bar&baz=1') as qs;
+    test=# SELECT parse_qs('foo=bar&baz=1') AS qs;
                qs
     -------------------------
      {"foo":"bar","baz":"1"}
@@ -190,3 +190,4 @@ to expect from the lifted function:
 # License
 
 MIT
+
