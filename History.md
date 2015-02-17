@@ -1,3 +1,6 @@
+0.7.0 / 2014-02-18
+  * Switch to browserify for bundling.
+
 0.6.5 / 2014-02-03
   * Export `util`, which comes with the define-schema helper
 
