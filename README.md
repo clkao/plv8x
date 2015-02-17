@@ -146,7 +146,7 @@ Let's try reusing some existing npm modules:
     % psql test
 
     # parse a query string
-    test=# SELECT ~>'require("qs").parse("foo=bar&baz=1")' AS qs;
+    test=# SELECT |>'require("qs").parse("foo=bar&baz=1")' AS qs;
                qs
     -------------------------
      {"foo":"bar","baz":"1"}
