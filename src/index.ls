@@ -33,28 +33,19 @@ class PLX
     @query "delete from plv8x.code where name = $1" [name], -> cb it.rows
 
   _bundle: (name, manifest, cb) ->
-    require! <[one tmp path fs]>
-    exclude = <[one pg plv8x pgrest express optimist]>
+    require! <[browserify fs]>
+    exclude = <[one browserify pg plv8x pgrest express optimist]>
 
     if name is \pgrest
       # XXX temporary solution till we get proper manifest exclusion going
       exclude ++= <[express cors gzippo connect-csv]>
 
-    err, tmpfile <~ tmp.tmpName
+    b = browserify {exclude, +ignoreMissing, standalone: name, -derequire}
+    b.require manifest - /\package\.json$/, {+entry}
 
-    function replacer re, to then -> it.replace re, to
-    camelize = replacer /-[a-z]/ig -> it.char-at 1 .to-upper-case!
-    # XXX one 2.0.8 bug: absolute manifest doesn't work
-    o = one path.relative process.cwd!, manifest
-      .exclude ...exclude
-      .name camelize name
-
-    # XXX some way of injecting node core modules later
-    if name is \sequelize
-      o.dependency \util \* .dependency \events \*
-    err, bundle <- o.save
-    throw err if err
-    cb bundle
+    err, buf <- b.bundle
+    console.log err if err
+    cb buf
 
   import-bundle: (name, manifest, cb) ->
     bundle_from = (name, m, cb) ~>
@@ -62,12 +53,15 @@ class PLX
         cb (require \fs .readFileSync m, \utf8)
       else
         @_bundle name, m, cb
+    {mtime} = require 'fs' .statSync manifest
+    rows <~ @query "select updated from plv8x.code where name = $1" [name]
+    if rows.length
+      return cb! if rows.0.updated and rows.0.updated >= mtime
     code <~ bundle_from name, manifest
-    rows <~ @query "select name from plv8x.code where name = $1" [name]
     [q, bind] = if rows.length # udpate
-      ["update plv8x.code set code = $2 where name = $1" [name, code]]
+      ["update plv8x.code set code = $2, updated = $3 where name = $1" [name, code, mtime]]
     else
-      ["insert into plv8x.code (name, code) values($1, $2)" [name, code]]
+      ["insert into plv8x.code (name, code, updated) values($1, $2, $3)" [name, code, mtime]]
     @query q, bind, cb
 
   import-funcs: (name, pkg, bootstrap, cb) ->

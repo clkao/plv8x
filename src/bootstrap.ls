@@ -100,24 +100,25 @@ _require = (name) ->
   res = plv8.execute "select name, code from plv8x.code #exclude", []
   x = {}
   err = ''
-  for {code,name:bundle} in res
+  for {code,name:bundle} in res# when bundle is name
     plv8x.require-stack.push bundle
     try
       loader = """
 (function() {
     var module = {exports: {}};
-    var context = {};
+    var global = {};
     var require = function(name) {
       if (name === '#name') {
         throw new Error('Cannot find module "#name"');
       }
       return plv8x.require(name);
     };
-    (function() { #code }).apply(context);
+    (function() { #code }).apply(global);
     if (module.exports.require)
       return module.exports.require('#name');
     else
-      return context['#name'];
+      return global['#name']
+
 })()
 """
       if eval loader
@@ -126,9 +127,12 @@ _require = (name) ->
     catch e
       err := e
       if e isnt /Cannot find module/
+        plv8x.require-stack = []
         break
     plv8x.require-stack.pop!
+
   plv8.elog WARNING, "failed to load module #name: #err"
+  plv8.elog WARNING, err.stack?substr(0, 235) if err.stack
 
 _mk_json_eval = (type=1) -> match type
   | (> 0) => (code, data) ->
