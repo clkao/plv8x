@@ -13,6 +13,7 @@ module.exports = (drop, cascade, done) ->
     [_, pg_version] = rows.0.version.match /^PostgreSQL ([\d\.]+)/
     if pg_version >= \9.1.0
       ..query '''
+SET client_min_messages TO WARNING;
 DO $$ BEGIN
     CREATE EXTENSION IF NOT EXISTS plv8;
 EXCEPTION WHEN OTHERS THEN END; $$;
