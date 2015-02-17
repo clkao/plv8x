@@ -26,6 +26,10 @@ sudo easy_install pgxnclient
 sudo pgxn install plv8
 ```
 
+# Install LiveScript (pre-requisite)
+
+    % npm i -g LiveScript
+
 # Install plv8x
 
     % git clone git://github.com/clkao/plv8x.git; cd plv8x
@@ -43,6 +47,12 @@ We support synonymous `PLV8XDB` and `PLV8XCONN` environment variables,
 so there's no need to type `-d` over and over again on the command line:
 
     % export PLV8XDB=test
+
+To connect with `ident` (local Unix user) authentication, specify the path
+to the socket directory with `-d`:
+
+    % plv8x -d /var/run/postgresql -l
+    plv8x: 491425 bytes
 
 Now create some test data with json columns: (example table from [Postgres 9.3 feature highlight: JSON operators](http://michael.otacoo.com/postgresql-2/postgres-9-3-feature-highlight-json-operators/))
 
@@ -72,7 +82,7 @@ If you like coffee, `@` works too:
 
 For multiple keys, you can of course do `b~>'@f1'~>'@f12'`, but single expression will do:
 
-    test=# SELECT b~>'@f1'~>'@f12' as f12_long, b~>'@f1.f12' AS f12 FROM aa WHERE a = 2;
+    test=# SELECT b~>'@f1'~>'@f12' AS f12_long, b~>'@f1.f12' AS f12 FROM aa WHERE a = 2;
      f12_long | f12
     ----------+-----
      12       | 12
@@ -94,35 +104,35 @@ Unary `~>` for just evaluating the expression:
 `~>` is actually a shorthand for `|> '~>...'`.  Using raw `|>` for plain
 old javascript:
 
-    test=# select '{"foo": [1,2,3]}'::json |> 'function() { return this.foo[1] }';
+    test=# SELECT '{"foo": [1,2,3]}'::json |> 'function() { return this.foo[1] }';
      ?column?
     ----------
      2
 
 Expression works too:
 
-    test=# select '{"foo": [1,2,3]}'::json |> 'return this.foo[1]';
+    test=# SELECT '{"foo": [1,2,3]}'::json |> 'return this.foo[1]';
      ?column?
     ----------
      2
 
 CoffeeScript:
 
-    test=# select '{"foo": [1,2,3]}'::json |> '@foo[1]';
+    test=# SELECT '{"foo": [1,2,3]}'::json |> '@foo[1]';
      ?column?
     ----------
      2
 
 ```<|``` is ```|>``` reversed:
 
-    test=# select '@foo.1 * 5' <| '{"foo": [1,2,3]}'::json
+    test=# SELECT '@foo.1 * 5' <| '{"foo": [1,2,3]}'::json
      ?column?
     ----------
      10
 
 ```|>``` as unary operator:
 
-    test=# select |> '~> plv8x.require "LiveScript" .compile "-> \Hello" {+bare}';
+    test=# SELECT |> '~> plv8x.require "LiveScript" .compile "-> \Hello" {+bare}';
                    ?column?
     --------------------------------------
      "(function(){\n  return Hello;\n});"
@@ -136,13 +146,13 @@ Let's try reusing some existing npm modules:
     % psql test
 
     # parse a query string
-    test=# select ~>'require("qs").parse("foo=bar&baz=1")' as qs;
+    test=# SELECT ~>'require("qs").parse("foo=bar&baz=1")' AS qs;
                qs
     -------------------------
      {"foo":"bar","baz":"1"}
 
     # actually use the parsed query string as json
-    test=# select qs~>'@foo' as foo from  (select ~>'require("qs").parse("foo=bar&baz=1")' as qs) a;
+    test=# SELECT qs~>'@foo' AS foo FROM  (SELECT ~>'require("qs").parse("foo=bar&baz=1")' AS qs) a;
       foo
     -------
      "bar"
@@ -151,7 +161,7 @@ Let's try reusing some existing npm modules:
     % plv8x -f 'plv8x.json parse_qs(text)=qs:parse'
     ok plv8x.json parse_qs(text)
     # Now parse_qs is a postgresql function:
-    test=# select parse_qs('foo=bar&baz=1') as qs;
+    test=# SELECT parse_qs('foo=bar&baz=1') AS qs;
                qs
     -------------------------
      {"foo":"bar","baz":"1"}
@@ -180,3 +190,4 @@ to expect from the lifted function:
 # License
 
 MIT
+

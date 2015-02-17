@@ -5,7 +5,7 @@ var plx, plv8x, conString, pg_version
 describe 'db', -> ``it``
   .. 'loaded successfully.', (done) ->
     # Load home page
-    conString := "tcp://localhost/#{ process.env.TESTDBNAME }"
+    conString := process.env.TESTDB ? "tcp://localhost/#{ process.env.TESTDBNAME }"
     plv8x := require \..
     plv8x.should.be.ok
     _plx <- plv8x.new conString

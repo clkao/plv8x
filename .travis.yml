@@ -29,6 +29,7 @@ language: node_js
 
 env:
   matrix:
+    - PGVERSION=9.4
     - PGVERSION=9.3
     - PGVERSION=9.2
     - PGVERSION=9.1

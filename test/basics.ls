@@ -5,7 +5,7 @@ var plx, plv8x, conString
 describe 'db', -> ``it``
   .. 'loaded successfully.', (done) ->
     # Load home page
-    conString := "tcp://localhost/#{ process.env.TESTDBNAME }"
+    conString := process.env.TESTDB ? "tcp://localhost/#{ process.env.TESTDBNAME }"
     console.log conString
     plv8x := require \..
     plv8x.should.be.ok
