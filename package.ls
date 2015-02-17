@@ -24,9 +24,10 @@ scripts:
   """
 engines: {node: '*'}
 dependencies:
-  async: \0.2.x
+  async: '^0.9.0'
   optimist: \0.6.x
-  pg: \2.8.x
+  pg: '^4.2.0'
+  'pg-native': '^1.8.0'
   resolve: \0.6.x
   one: \2.5.x
   tmp: '0.0.x'
@@ -34,8 +35,8 @@ dependencies:
 #  'coffee-script': \*
   'js-yaml': \3.0.x
 devDependencies:
-  mocha: \*
-  chai: \*
+  mocha: '^2.1.0'
+  chai: '^2.0.0'
   sequelize: 'git://github.com/clkao/sequelize.git'
   uax11: \0.0.2
 optionalDependencies: {}
