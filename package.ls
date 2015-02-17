@@ -32,6 +32,7 @@ dependencies:
   one: \2.5.x
   tmp: '0.0.x'
   LiveScript: \1.2.0
+  'pretty-bytes': '^1.0.3'
 #  'coffee-script': \*
   'js-yaml': \3.0.x
 devDependencies:

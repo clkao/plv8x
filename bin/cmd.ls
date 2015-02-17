@@ -1,5 +1,5 @@
 ``#!/usr/bin/env node``
-require! <[fs resolve pg]>
+require! <[fs resolve pg pretty-bytes]>
 plv8x = require \../
 
 argv = require 'optimist' .usage 'Usage: plv8x {OPTIONS}' .wrap 80
@@ -79,7 +79,7 @@ switch
 | argv.list =>
   plx.list (res) ->
     unless argv.json
-      res = ["#name: #{length} bytes" for {name, length} in res].join '\n'
+      res = ["#name: #{pretty-bytes length}" for {name, length} in res].join '\n'
     done res
 | argv.query =>
   plx.query argv.query, done
