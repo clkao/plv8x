@@ -1,11 +1,11 @@
 should = (require \chai).should!
 
 expect = (require \chai).expect
-var plx
+var plx, conString
 describe 'db', -> ``it``
   .. 'loaded successfully.', (done) ->
     # Load home page
-    conString = "tcp://localhost/#{ process.env.TESTDBNAME }"
+    conString := process.env.TESTDB ? "tcp://localhost/#{ process.env.TESTDBNAME }"
     plv8x = require \..
     plv8x.should.be.ok
     _plx <- plv8x.new conString
