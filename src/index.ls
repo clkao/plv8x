@@ -53,12 +53,15 @@ class PLX
         cb (require \fs .readFileSync m, \utf8)
       else
         @_bundle name, m, cb
+    {mtime} = require 'fs' .statSync manifest
+    rows <~ @query "select updated from plv8x.code where name = $1" [name]
+    if rows.length
+      return cb! if rows.0.updated and rows.0.updated >= mtime
     code <~ bundle_from name, manifest
-    rows <~ @query "select name from plv8x.code where name = $1" [name]
     [q, bind] = if rows.length # udpate
-      ["update plv8x.code set code = $2 where name = $1" [name, code]]
+      ["update plv8x.code set code = $2, updated = $3 where name = $1" [name, code, mtime]]
     else
-      ["insert into plv8x.code (name, code) values($1, $2)" [name, code]]
+      ["insert into plv8x.code (name, code, updated) values($1, $2, $3)" [name, code, mtime]]
     @query q, bind, cb
 
   import-funcs: (name, pkg, bootstrap, cb) ->
