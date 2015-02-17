@@ -27,8 +27,7 @@ dependencies:
   pg: '^4.2.0'
   'pg-native': '^1.8.0'
   resolve: \0.6.x
-  browserify: '^3.46.1'
-  'stream-buffers': '^0.2.5'
+  browserify: '^8.1.3'
   tmp: '0.0.x'
   LiveScript: \1.2.0
 #  'coffee-script': \*

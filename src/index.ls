@@ -40,13 +40,12 @@ class PLX
       # XXX temporary solution till we get proper manifest exclusion going
       exclude ++= <[express cors gzippo connect-csv]>
 
-    b = browserify!
+    b = browserify {exclude, +ignoreMissing, standalone: name, -derequire}
     b.require manifest - /\package\.json$/, {+entry}
-    require! 'stream-buffers'
-    buffer = new stream-buffers.WritableStreamBuffer!
-    buffer.on \close -> cb buffer.get-contents-as-string!
 
-    b.bundle {exclude, +ignoreMissing, standalone: name, -derequire} .pipe buffer
+    err, buf <- b.bundle
+    console.log err if err
+    cb buf
 
   import-bundle: (name, manifest, cb) ->
     bundle_from = (name, m, cb) ~>
