@@ -70,7 +70,12 @@ class PLX
     cb!
 
   import-bundle-funcs: (name, manifest, body) ->
-    pkg = require (manifest - /package\.json$/)
+    pkg = try require (manifest - /package\.json$/)
+    unless pkg
+      return @import-bundle name, manifest, (cb) ~>
+        cb <~ body
+        return cb!
+
     <~ @import-funcs name, pkg, true
     <~ @import-bundle name, manifest
     cb <~ body
