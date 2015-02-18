@@ -33,14 +33,15 @@ class PLX
     @query "delete from plv8x.code where name = $1" [name], -> cb it.rows
 
   _bundle: (name, manifest, cb) ->
-    require! <[browserify fs]>
-    exclude = <[one browserify pg plv8x pgrest express optimist]>
+    require! <[browserify]>
+    exclude = <[one browserify pg plv8x pgrest express optimist uax11]>
 
     if name is \pgrest
       # XXX temporary solution till we get proper manifest exclusion going
       exclude ++= <[express cors gzippo connect-csv]>
 
-    b = browserify {exclude, +ignoreMissing, standalone: name, -derequire}
+    b = browserify {+ignoreMissing, standalone: name}
+    for module in exclude => b.exclude module
     b.require manifest - /\package\.json$/, {+entry}
 
     err, buf <- b.bundle
@@ -49,10 +50,7 @@ class PLX
 
   import-bundle: (name, manifest, cb) ->
     bundle_from = (name, m, cb) ~>
-      if m is /\.js$/
-        cb (require \fs .readFileSync m, \utf8)
-      else
-        @_bundle name, m, cb
+      @_bundle name, m, cb
     {mtime} = require 'fs' .statSync manifest
     rows <~ @query "select updated from plv8x.code where name = $1" [name]
     if rows.length
