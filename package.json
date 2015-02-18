@@ -16,7 +16,7 @@
   ],
   "main": "lib/index.js",
   "bin": {
-    "plv8x": "bin/cmd.js"
+    "plv8x": "bin/plv8x"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,7 @@
   },
   "scripts": {
     "test": "env PATH=\"./node_modules/.bin:$PATH\" mocha",
-    "prepublish": "env PATH=\"./node_modules/.bin:$PATH\" lsc -cj package.ls &&\nenv PATH=\"./node_modules/.bin:$PATH\" lsc -bpc bin/cmd.ls > bin/cmd.js &&\nenv PATH=\"./node_modules/.bin:$PATH\" lsc -bc -o lib src"
+    "prepublish": "env PATH=\"./node_modules/.bin:$PATH\" lsc -cj package.ls &&\nenv PATH=\"./node_modules/.bin:$PATH\" lsc -bc -o lib src"
   },
   "engines": {
     "node": "*"

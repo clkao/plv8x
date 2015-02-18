@@ -8,7 +8,7 @@ version: '0.7.0'
 keywords: <[postgres pg database plv8]>
 main: \lib/index.js
 bin:
-  plv8x: 'bin/cmd.js'
+  plv8x: 'bin/plv8x'
 repository:
   type: 'git'
   url: 'git://github.com/clkao/plv8x.git'
@@ -17,7 +17,6 @@ scripts:
     env PATH="./node_modules/.bin:$PATH" mocha'
   prepublish: """
     env PATH="./node_modules/.bin:$PATH" lsc -cj package.ls &&
-    env PATH="./node_modules/.bin:$PATH" lsc -bpc bin/cmd.ls > bin/cmd.js &&
     env PATH="./node_modules/.bin:$PATH" lsc -bc -o lib src
   """
 engines: {node: '*'}

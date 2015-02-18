@@ -1,4 +1,3 @@
-``#!/usr/bin/env node``
 require! <[fs resolve pg pretty-bytes]>
 plv8x = require \../
 
