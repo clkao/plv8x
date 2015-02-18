@@ -6,6 +6,39 @@ plv8x
 plv8x helps you manage functions and packages in plv8, postgresql's javascript
 procedural language support.
 
+# Quick start with docker
+
+Using the docker-based postgresql with plv8js enabled:
+
+```
+% docker run -p 5433:5432 -d --name postgres clkao/postgres-plv8:9.4
+
+% createdb -U postgres -h 127.0.0.1 -p 5433 test
+% export PLV8XDB=postgres://postgres@127.0.0.1:5433/test
+
+% plv8x --list
+plv8x: 392.25 kB
+
+# import the qs package from npm
+% npm i qs; plv8x -i qs; plv8x --list
+plv8x: 392.25 kB
+qs: 9.37 kB
+
+# this is now evaluated inside postgresql
+% plv8x -e 'require("qs").parse("foo=bar&baz=1")'
+{ foo: 'bar', baz: '1' }
+
+# .. which  is actually equivalent to:
+% psql $PLV8DB -c 'select |> $$ require("qs").parse("foo=bar&baz=1") $$'
+        ?column?
+-------------------------
+ {"foo":"bar","baz":"1"}
+(1 row)
+
+
+```
+
+
 # Install plv8js
 
 Note: Requires postgresql 9.0 or later.
