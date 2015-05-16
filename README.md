@@ -61,7 +61,7 @@ sudo pgxn install plv8
 
 # Install LiveScript (pre-requisite)
 
-    % npm i -g LiveScript
+    % npm i -g livescript
 
 # Install plv8x
 
@@ -165,7 +165,7 @@ CoffeeScript:
 
 ```|>``` as unary operator:
 
-    test=# SELECT |> '~> plv8x.require "LiveScript" .compile "-> \Hello" {+bare}';
+    test=# SELECT |> '~> plv8x.require "livescript" .compile "-> \Hello" {+bare}';
                    ?column?
     --------------------------------------
      "(function(){\n  return Hello;\n});"

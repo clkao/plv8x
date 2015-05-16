@@ -1,4 +1,4 @@
---require LiveScript
+--require livescript
 --colors
---compilers ls:LiveScript
+--compilers ls:livescript
 --timeout 5000

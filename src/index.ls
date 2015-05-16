@@ -157,7 +157,7 @@ export function xpression-to-body(code)
   | otherwise       => "(function(){return #code})"
 
 export function compile-livescript(expression)
-  require \LiveScript .compile expression, {+bare} .replace /;$/, ''
+  require \livescript .compile expression, {+bare} .replace /;$/, ''
 
 export function compile-coffeescript(expression)
   cs = require \CoffeeScript

@@ -28,7 +28,7 @@ dependencies:
   resolve: \0.6.x
   browserify: '^8.1.3'
   tmp: '0.0.x'
-  LiveScript: \1.2.0
+  livescript: '~1.4.0'
   'pretty-bytes': '^1.0.3'
 #  'coffee-script': \*
   'js-yaml': \3.0.x

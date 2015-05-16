@@ -28,8 +28,8 @@ describe 'db', -> ``it``
     expect JSON.parse rows.0.ret .to.equal(3)
     done!
   .. 'livescript |> ~>', (done) ->
-    <- plx.import-bundle \LiveScript './node_modules/LiveScript/package.json'
-    rows <- plx.query "select |> $1 as ret" ['~> plv8x.require "LiveScript" .VERSION']
+    <- plx.import-bundle \livescript './node_modules/livescript/package.json'
+    rows <- plx.query "select |> $1 as ret" ['~> plv8x.require "livescript" .VERSION']
     console.log rows
     expect rows.0.ret .to.equal \1.2.0
     done!
@@ -42,8 +42,8 @@ describe 'db', -> ``it``
     expect JSON.parse rows.0.ret .to.equal(3)
     done!
   .. 'livescript ~>', (done) ->
-    <- plx.import-bundle \LiveScript './node_modules/LiveScript/package.json'
-    rows <- plx.query "select ~> $1 as ret" ['plv8x.require "LiveScript" .VERSION']
+    <- plx.import-bundle \livescript './node_modules/livescript/package.json'
+    rows <- plx.query "select ~> $1 as ret" ['plv8x.require "livescript" .VERSION']
     console.log rows
     expect rows.0.ret .to.equal \1.2.0
     done!

@@ -29,30 +29,30 @@ describe 'db', -> ``it``
     expect [name for {name} in res] .to.be.deep.equal <[plv8x]>
     done!
   .. 'import', (done) ->
-    <- plx.import-bundle \LiveScript, './node_modules/LiveScript/package.json'
+    <- plx.import-bundle \livescript, './node_modules/livescript/package.json'
     res <- plx.list
-    expect [name for {name} in res] .to.be.deep.equal <[plv8x LiveScript]>
+    expect [name for {name} in res] .to.be.deep.equal <[plv8x livescript]>
     done!
   .. 'import existing', (done) ->
-    <- plx.import-bundle \LiveScript, './node_modules/LiveScript/package.json'
+    <- plx.import-bundle \livescript, './node_modules/livescript/package.json'
     res <- plx.list
-    expect [name for {name} in res] .to.be.deep.equal <[plv8x LiveScript]>
+    expect [name for {name} in res] .to.be.deep.equal <[plv8x livescript]>
     done!
   .. 'plv8x_require', (done) ->
-    err, res <- plx.conn.query "select plv8x.eval($1) as ret", ["plv8x_require('LiveScript').VERSION"]
+    err, res <- plx.conn.query "select plv8x.eval($1) as ret", ["plv8x_require('livescript').VERSION"]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
-    expect ret .to.equal \1.2.0
+    expect ret .to.match /^1\.4\./
     done!
   .. 'lscompile', (done) ->
-    plx.conn.query plv8x._mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x.plv8x-lift "LiveScript", "compile"
+    plx.conn.query plv8x._mk_func \plv8x.lscompile {str: \text, args: \plv8x.json} \text plv8x.plv8x-lift "livescript", "compile"
     err, res <- plx.conn.query "select plv8x.lscompile($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
     expect (eval ret)! .to.equal 42
     done!
   .. 'mk-user-func', (done) ->
-    <- plx.mk-user-func "text lsgo(text, plv8x.json)", ':-> plv8x_require "LiveScript" .compile ...'
+    <- plx.mk-user-func "text lsgo(text, plv8x.json)", ':-> plv8x_require "livescript" .compile ...'
     err, res <- plx.conn.query "select lsgo($1, $2) as ret", ["-> 42", JSON.stringify {+bare}]
     expect(err).to.be.a('null');
     {ret} = res.rows.0
@@ -63,9 +63,9 @@ describe 'db', -> ``it``
     it.body.should.match /return plv8x.require\('fast-json-patch'\).apply.apply\(this, arguments\)/
     done!
   .. 'required object persistency', (done) ->
-    err, res <- plx.conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx = 123')"""
+    err, res <- plx.conn.query """select plv8x.eval('plv8x_require("livescript").xxx = 123')"""
     expect(err).to.be.a('null');
-    err, res <- plx.conn.query """select plv8x.eval('plv8x_require("LiveScript").xxx') as ret"""
+    err, res <- plx.conn.query """select plv8x.eval('plv8x_require("livescript").xxx') as ret"""
     expect err .to.be.a('null');
     {ret} = res.rows.0
     expect ret .to.equal 123
